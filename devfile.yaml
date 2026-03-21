@@ -1,0 +1,122 @@
+schemaVersion: 2.2.0
+metadata:
+  name: neuroface
+  version: 1.0.0
+  displayName: NeuroFace - Facial Recognition ML
+  description: Facial recognition webapp with FastAPI backend and Angular frontend
+  tags:
+    - Python
+    - Angular
+    - FastAPI
+    - OpenCV
+    - Machine-Learning
+  projectType: Python
+  language: Python
+
+components:
+  - name: backend
+    container:
+      image: registry.access.redhat.com/ubi9/python-311:latest
+      command: ['tail', '-f', '/dev/null']
+      mountSources: true
+      sourceMapping: /projects/neuroface
+      memoryLimit: 1Gi
+      cpuLimit: "1"
+      endpoints:
+        - name: backend-api
+          targetPort: 8080
+          exposure: public
+          protocol: https
+      env:
+        - name: NEUROFACE_AI_MODEL
+          value: lbph
+        - name: NEUROFACE_DATA_DIR
+          value: /projects/neuroface/backend/app/resources/data
+
+  - name: frontend
+    container:
+      image: registry.access.redhat.com/ubi9/nodejs-20:latest
+      command: ['tail', '-f', '/dev/null']
+      mountSources: true
+      sourceMapping: /projects/neuroface
+      memoryLimit: 512Mi
+      cpuLimit: 500m
+      endpoints:
+        - name: frontend-dev
+          targetPort: 4200
+          exposure: public
+          protocol: https
+      env:
+        - name: NODE_OPTIONS
+          value: "--max_old_space_size=512"
+
+  - name: data
+    volume:
+      size: 1Gi
+
+commands:
+  - id: install-backend
+    exec:
+      label: "1. Install backend dependencies"
+      component: backend
+      workingDir: /projects/neuroface/backend
+      commandLine: |
+        pip install --user -r requirements.txt
+      group:
+        kind: build
+        isDefault: false
+
+  - id: run-backend
+    exec:
+      label: "2. Run backend (FastAPI)"
+      component: backend
+      workingDir: /projects/neuroface/backend
+      commandLine: |
+        uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload
+      group:
+        kind: run
+        isDefault: false
+
+  - id: install-frontend
+    exec:
+      label: "3. Install frontend dependencies"
+      component: frontend
+      workingDir: /projects/neuroface/frontend
+      commandLine: |
+        npm install && chmod -R u+x node_modules/.bin/
+      group:
+        kind: build
+        isDefault: false
+
+  - id: run-frontend
+    exec:
+      label: "4. Run frontend (Angular dev server)"
+      component: frontend
+      workingDir: /projects/neuroface/frontend
+      commandLine: |
+        npx ng serve --host 0.0.0.0 --port 4200 --disable-host-check --proxy-config proxy.conf.json
+      group:
+        kind: run
+        isDefault: false
+
+  - id: build-frontend
+    exec:
+      label: "Build frontend for production"
+      component: frontend
+      workingDir: /projects/neuroface/frontend
+      commandLine: |
+        npm run build -- --configuration production
+      group:
+        kind: build
+        isDefault: false
+
+  - id: train-model
+    exec:
+      label: "Train recognition model"
+      component: backend
+      workingDir: /projects/neuroface/backend
+      commandLine: |
+        curl -X POST http://localhost:8080/api/train
+      group:
+        kind: run
+        isDefault: false

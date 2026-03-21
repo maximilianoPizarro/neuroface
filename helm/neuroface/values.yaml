@@ -1,0 +1,43 @@
+backend:
+  image:
+    repository: quay.io/maximilianopizarro/neuroface-backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  replicas: 1
+  port: 8080
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  aiModel: lbph
+
+frontend:
+  image:
+    repository: quay.io/maximilianopizarro/neuroface-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  replicas: 1
+  port: 8080
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 128Mi
+
+route:
+  enabled: true
+  host: ""
+  tls:
+    termination: edge
+
+persistence:
+  enabled: true
+  size: 1Gi
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce

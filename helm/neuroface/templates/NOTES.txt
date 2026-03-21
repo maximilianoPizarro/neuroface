@@ -1,0 +1,25 @@
+NeuroFace has been deployed!
+
+Components:
+  - Backend:  {{ include "neuroface.fullname" . }}-backend
+  - Frontend: {{ include "neuroface.fullname" . }}-frontend
+
+{{- if .Values.route.enabled }}
+
+OpenShift Route:
+  The application is accessible via the route:
+  {{- if .Values.route.host }}
+  https://{{ .Values.route.host }}
+  {{- else }}
+  Run: oc get route {{ include "neuroface.fullname" . }} -o jsonpath='{.spec.host}'
+  {{- end }}
+{{- else }}
+
+To access the application, run:
+  kubectl port-forward svc/{{ include "neuroface.fullname" . }}-frontend {{ .Values.frontend.port }}:{{ .Values.frontend.port }}
+
+Then open http://localhost:{{ .Values.frontend.port }}
+{{- end }}
+
+AI Model: {{ .Values.backend.aiModel | upper }}
+Swagger UI: /api/docs

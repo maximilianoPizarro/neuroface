@@ -1,0 +1,69 @@
+# Build NeuroFace images and push to quay.io
+# Requires GitHub secrets:
+#   QUAY_USERNAME, QUAY_PASSWORD (Quay robot account)
+#   REDHAT_REGISTRY_USERNAME, REDHAT_REGISTRY_PASSWORD (Red Hat registry for UBI base images)
+# Optional: QUAY_NAMESPACE (default: maximilianopizarro)
+
+name: Build and push to Quay.io
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+env:
+  QUAY_REGISTRY: quay.io
+  QUAY_NAMESPACE: maximilianopizarro
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to Quay.io
+        uses: docker/login-action@v3
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
+
+      - name: Log in to Red Hat registry (registry.access.redhat.com)
+        uses: docker/login-action@v3
+        with:
+          registry: registry.access.redhat.com
+          username: ${{ secrets.REDHAT_REGISTRY_USERNAME }}
+          password: ${{ secrets.REDHAT_REGISTRY_PASSWORD }}
+
+      - name: Log in to Red Hat registry (registry.redhat.io)
+        uses: docker/login-action@v3
+        with:
+          registry: registry.redhat.io
+          username: ${{ secrets.REDHAT_REGISTRY_USERNAME }}
+          password: ${{ secrets.REDHAT_REGISTRY_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver: docker
+
+      - name: Build and push neuroface-backend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.QUAY_REGISTRY }}/${{ env.QUAY_NAMESPACE }}/neuroface-backend:latest
+            ${{ env.QUAY_REGISTRY }}/${{ env.QUAY_NAMESPACE }}/neuroface-backend:${{ github.sha }}
+
+      - name: Build and push neuroface-frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.QUAY_REGISTRY }}/${{ env.QUAY_NAMESPACE }}/neuroface-frontend:latest
+            ${{ env.QUAY_REGISTRY }}/${{ env.QUAY_NAMESPACE }}/neuroface-frontend:${{ github.sha }}
