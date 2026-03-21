@@ -2,7 +2,7 @@ backend:
   image:
     repository: quay.io/maximilianopizarro/neuroface-backend
     tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
   replicas: 1
   port: 8080
   resources:
@@ -18,7 +18,7 @@ frontend:
   image:
     repository: quay.io/maximilianopizarro/neuroface-frontend
     tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
   replicas: 1
   port: 8080
   resources:

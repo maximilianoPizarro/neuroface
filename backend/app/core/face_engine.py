@@ -1,6 +1,7 @@
 """Core face detection and recognition engine adapted from reconocimiento-facial archetype."""
 
 import base64
+import logging
 import os
 import pickle
 from typing import Optional
@@ -12,10 +13,13 @@ from PIL import Image
 from app.core.config import settings, CASCADES_DIR
 from app.models.base import FaceRecognitionModel
 
+logger = logging.getLogger(__name__)
+
 
 class FaceEngine:
     def __init__(self):
         cascade_path = os.path.join(CASCADES_DIR, settings.cascade_face)
+        logger.info("Loading Haar cascade from: %s (exists=%s)", cascade_path, os.path.exists(cascade_path))
         if not os.path.exists(cascade_path):
             raise FileNotFoundError(
                 f"Haar cascade not found at {cascade_path}. "
