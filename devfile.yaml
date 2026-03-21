@@ -32,8 +32,6 @@ components:
           value: lbph
         - name: NEUROFACE_DATA_DIR
           value: /projects/neuroface/backend/app/resources/data
-        - name: NEUROFACE_CASCADES_DIR
-          value: /projects/neuroface/backend/app/resources/cascades
 
   - name: frontend
     container:

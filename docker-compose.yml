@@ -12,7 +12,6 @@ services:
     environment:
       NEUROFACE_AI_MODEL: lbph
       NEUROFACE_DATA_DIR: /data
-      NEUROFACE_CASCADES_DIR: /opt/app-root/src/app/resources/cascades
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
       interval: 30s

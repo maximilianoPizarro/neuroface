@@ -9,16 +9,21 @@ import cv2
 import numpy as np
 from PIL import Image
 
-from app.core.config import settings
+from app.core.config import settings, CASCADES_DIR
 from app.models.base import FaceRecognitionModel
 
 
 class FaceEngine:
     def __init__(self):
-        cascade_path = os.path.join(settings.cascades_dir, settings.cascade_face)
+        cascade_path = os.path.join(CASCADES_DIR, settings.cascade_face)
+        if not os.path.exists(cascade_path):
+            raise FileNotFoundError(
+                f"Haar cascade not found at {cascade_path}. "
+                f"CASCADES_DIR={CASCADES_DIR}"
+            )
         self.face_cascade = cv2.CascadeClassifier(cascade_path)
 
-        eye_cascade_path = os.path.join(settings.cascades_dir, settings.cascade_eye)
+        eye_cascade_path = os.path.join(CASCADES_DIR, settings.cascade_eye)
         if os.path.exists(eye_cascade_path):
             self.eye_cascade = cv2.CascadeClassifier(eye_cascade_path)
         else:

@@ -1,6 +1,9 @@
 import os
 from pydantic_settings import BaseSettings
 
+_APP_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CASCADES_DIR = os.path.join(_APP_DIR, "resources", "cascades")
+
 
 class Settings(BaseSettings):
     app_name: str = "NeuroFace API"
@@ -8,8 +11,7 @@ class Settings(BaseSettings):
     debug: bool = False
 
     ai_model: str = "lbph"
-    data_dir: str = os.path.join(os.path.dirname(os.path.dirname(__file__)), "resources", "data")
-    cascades_dir: str = os.path.join(os.path.dirname(os.path.dirname(__file__)), "resources", "cascades")
+    data_dir: str = os.path.join(_APP_DIR, "resources", "data")
 
     images_dir: str = ""
     models_dir: str = ""

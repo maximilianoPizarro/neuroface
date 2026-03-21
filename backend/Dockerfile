@@ -12,7 +12,6 @@ COPY app/ ./app/
 
 ENV NEUROFACE_AI_MODEL=lbph
 ENV NEUROFACE_DATA_DIR=/data
-ENV NEUROFACE_CASCADES_DIR=/opt/app-root/src/app/resources/cascades
 
 EXPOSE 8080
 

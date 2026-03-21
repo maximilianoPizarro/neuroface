@@ -7,4 +7,3 @@ metadata:
 data:
   NEUROFACE_AI_MODEL: {{ .Values.backend.aiModel | quote }}
   NEUROFACE_DATA_DIR: "/data"
-  NEUROFACE_CASCADES_DIR: "/opt/app-root/src/app/resources/cascades"
