@@ -4,6 +4,8 @@ metadata:
   name: {{ include "neuroface.fullname" . }}-frontend
   labels:
     {{- include "neuroface.frontendLabels" . | nindent 4 }}
+  annotations:
+    app.openshift.io/connects-to: '[{"apiVersion":"apps/v1","kind":"Deployment","name":"{{ include "neuroface.fullname" . }}-backend"}]'
 spec:
   replicas: {{ .Values.frontend.replicas }}
   selector:

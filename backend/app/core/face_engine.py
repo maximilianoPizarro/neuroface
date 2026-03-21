@@ -15,10 +15,10 @@ from app.models.base import FaceRecognitionModel
 
 class FaceEngine:
     def __init__(self):
-        cascade_path = os.path.join(settings.data_dir, settings.cascade_face)
+        cascade_path = os.path.join(settings.cascades_dir, settings.cascade_face)
         self.face_cascade = cv2.CascadeClassifier(cascade_path)
 
-        eye_cascade_path = os.path.join(settings.data_dir, settings.cascade_eye)
+        eye_cascade_path = os.path.join(settings.cascades_dir, settings.cascade_eye)
         if os.path.exists(eye_cascade_path):
             self.eye_cascade = cv2.CascadeClassifier(eye_cascade_path)
         else:

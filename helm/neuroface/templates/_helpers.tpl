@@ -37,6 +37,7 @@ Backend labels
 {{ include "neuroface.labels" . }}
 app.kubernetes.io/name: {{ include "neuroface.fullname" . }}-backend
 app.kubernetes.io/component: backend
+app.openshift.io/runtime: python
 {{- end }}
 
 {{/*
@@ -46,4 +47,5 @@ Frontend labels
 {{ include "neuroface.labels" . }}
 app.kubernetes.io/name: {{ include "neuroface.fullname" . }}-frontend
 app.kubernetes.io/component: frontend
+app.openshift.io/runtime: angularjs
 {{- end }}

@@ -14,3 +14,4 @@ COPY nginx.conf "${NGINX_DEFAULT_CONF_PATH}/default.conf"
 EXPOSE 8080
 
 CMD ["nginx", "-g", "daemon off;"]
+

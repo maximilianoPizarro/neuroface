@@ -9,6 +9,7 @@ class Settings(BaseSettings):
 
     ai_model: str = "lbph"
     data_dir: str = os.path.join(os.path.dirname(os.path.dirname(__file__)), "resources", "data")
+    cascades_dir: str = os.path.join(os.path.dirname(os.path.dirname(__file__)), "resources", "cascades")
 
     images_dir: str = ""
     models_dir: str = ""
