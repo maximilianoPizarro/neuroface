@@ -14,6 +14,7 @@ keywords:
   - fastapi
   - angular
   - opencv
+icon: https://raw.githubusercontent.com/maximilianoPizarro/neuroface/main/docs/icon.svg
 home: https://github.com/maximilianoPizarro/neuroface
 sources:
   - https://github.com/maximilianoPizarro/neuroface

@@ -1,0 +1,39 @@
+apiVersion: v1
+entries:
+  neuroface:
+  - annotations:
+      artifacthub.io/images: |
+        - name: backend
+          image: quay.io/maximilianopizarro/neuroface-backend:latest
+        - name: frontend
+          image: quay.io/maximilianopizarro/neuroface-frontend:latest
+      artifacthub.io/license: MIT
+      artifacthub.io/links: |
+        - name: Source
+          url: https://github.com/maximilianoPizarro/neuroface
+    apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-03-21T19:50:49.106152-03:00"
+    description: Facial Recognition Webapp with ML — FastAPI backend + Angular frontend
+      on Red Hat UBI9
+    digest: 74431c4f92fec0e9023c938a5a195158db169f502669f63b4c23cda1d8f4a3c4
+    home: https://github.com/maximilianoPizarro/neuroface
+    icon: https://raw.githubusercontent.com/maximilianoPizarro/neuroface/main/docs/icon.svg
+    keywords:
+    - facial-recognition
+    - machine-learning
+    - openshift
+    - fastapi
+    - angular
+    - opencv
+    maintainers:
+    - name: maximilianoPizarro
+      url: https://github.com/maximilianoPizarro
+    name: neuroface
+    sources:
+    - https://github.com/maximilianoPizarro/neuroface
+    type: application
+    urls:
+    - https://maximilianopizarro.github.io/neuroface/neuroface-1.0.0.tgz
+    version: 1.0.0
+generated: "2026-03-21T19:50:49.1040906-03:00"
