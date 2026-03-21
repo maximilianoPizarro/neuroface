@@ -13,10 +13,10 @@ entries:
           url: https://github.com/maximilianoPizarro/neuroface
     apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-03-21T19:50:49.106152-03:00"
+    created: "2026-03-21T20:00:00.1457408-03:00"
     description: Facial Recognition Webapp with ML — FastAPI backend + Angular frontend
       on Red Hat UBI9
-    digest: 74431c4f92fec0e9023c938a5a195158db169f502669f63b4c23cda1d8f4a3c4
+    digest: b133d760f65b565c6d22ab32b63d262ee5fd0b02fdb74966e323674b32346286
     home: https://github.com/maximilianoPizarro/neuroface
     icon: https://raw.githubusercontent.com/maximilianoPizarro/neuroface/main/docs/icon.svg
     keywords:
@@ -36,4 +36,4 @@ entries:
     urls:
     - https://maximilianopizarro.github.io/neuroface/neuroface-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-21T19:50:49.1040906-03:00"
+generated: "2026-03-21T20:00:00.1446869-03:00"
