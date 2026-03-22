@@ -7,3 +7,10 @@ metadata:
 data:
   NEUROFACE_AI_MODEL: {{ .Values.backend.aiModel | quote }}
   NEUROFACE_DATA_DIR: "/data"
+  NEUROFACE_DLIB_ENABLED: {{ .Values.backend.dlibEnabled | quote }}
+  NEUROFACE_CHAT_ENABLED: {{ .Values.chat.enabled | quote }}
+  NEUROFACE_CHAT_MODEL_ENDPOINT: {{ .Values.chat.modelEndpoint | quote }}
+  NEUROFACE_CHAT_MODEL_NAME: {{ .Values.chat.modelName | quote }}
+  NEUROFACE_CHAT_API_KEY: {{ .Values.chat.apiKey | quote }}
+  NEUROFACE_CHAT_MAX_TOKENS: {{ .Values.chat.maxTokens | quote }}
+  NEUROFACE_CHAT_SYSTEM_PROMPT: {{ .Values.chat.systemPrompt | quote }}

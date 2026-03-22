@@ -10,6 +10,8 @@ import {
   AvailableModel,
   LabelImages,
   LabelsResponse,
+  ChatStatusResponse,
+  ChatResponse,
 } from '../models/interfaces';
 
 @Injectable({ providedIn: 'root' })
@@ -70,5 +72,17 @@ export class ApiService {
 
   getAvailableModels(): Observable<{ models: AvailableModel[] }> {
     return this.http.get<{ models: AvailableModel[] }>(`${this.baseUrl}/models/available`);
+  }
+
+  chatStatus(): Observable<ChatStatusResponse> {
+    return this.http.get<ChatStatusResponse>(`${this.baseUrl}/chat/status`);
+  }
+
+  chat(message: string, image?: string): Observable<ChatResponse> {
+    const body: { message: string; image?: string } = { message };
+    if (image) {
+      body.image = image;
+    }
+    return this.http.post<ChatResponse>(`${this.baseUrl}/chat`, body);
   }
 }

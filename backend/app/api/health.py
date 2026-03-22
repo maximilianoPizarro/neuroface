@@ -18,4 +18,5 @@ async def readiness():
         "status": "ok",
         "model_loaded": face_engine.is_trained,
         "ai_model": settings.ai_model,
+        "chat_enabled": settings.chat_enabled,
     }

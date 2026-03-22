@@ -1,0 +1,297 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NeuroFace Helm Chart Values",
+  "description": "Facial Recognition Webapp with ML — FastAPI backend + Angular frontend on Red Hat UBI9",
+  "type": "object",
+  "properties": {
+    "backend": {
+      "type": "object",
+      "title": "Backend",
+      "description": "FastAPI backend configuration",
+      "properties": {
+        "image": {
+          "type": "object",
+          "title": "Container Image",
+          "properties": {
+            "repository": {
+              "type": "string",
+              "title": "Image Repository",
+              "description": "Backend container image repository",
+              "default": "quay.io/maximilianopizarro/neuroface-backend"
+            },
+            "tag": {
+              "type": "string",
+              "title": "Image Tag",
+              "description": "Backend container image tag",
+              "default": "latest"
+            },
+            "pullPolicy": {
+              "type": "string",
+              "title": "Image Pull Policy",
+              "enum": ["Always", "IfNotPresent", "Never"],
+              "default": "Always"
+            }
+          }
+        },
+        "replicas": {
+          "type": "integer",
+          "title": "Replicas",
+          "description": "Number of backend pod replicas",
+          "minimum": 1,
+          "default": 1
+        },
+        "port": {
+          "type": "integer",
+          "title": "Port",
+          "description": "Backend container port",
+          "default": 8080
+        },
+        "resources": {
+          "type": "object",
+          "title": "Resources",
+          "description": "CPU and memory resource limits/requests",
+          "properties": {
+            "limits": {
+              "type": "object",
+              "title": "Limits",
+              "properties": {
+                "cpu": {
+                  "type": "string",
+                  "title": "CPU Limit",
+                  "default": "500m"
+                },
+                "memory": {
+                  "type": "string",
+                  "title": "Memory Limit",
+                  "default": "512Mi"
+                }
+              }
+            },
+            "requests": {
+              "type": "object",
+              "title": "Requests",
+              "properties": {
+                "cpu": {
+                  "type": "string",
+                  "title": "CPU Request",
+                  "default": "100m"
+                },
+                "memory": {
+                  "type": "string",
+                  "title": "Memory Request",
+                  "default": "256Mi"
+                }
+              }
+            }
+          }
+        },
+        "aiModel": {
+          "type": "string",
+          "title": "AI Model",
+          "description": "Face recognition model to use",
+          "enum": ["lbph", "dlib"],
+          "default": "lbph"
+        },
+        "dlibEnabled": {
+          "type": "boolean",
+          "title": "Enable dlib",
+          "description": "Allow dlib face recognition model (requires face_recognition package in image)",
+          "default": false
+        }
+      }
+    },
+    "frontend": {
+      "type": "object",
+      "title": "Frontend",
+      "description": "Angular frontend configuration",
+      "properties": {
+        "image": {
+          "type": "object",
+          "title": "Container Image",
+          "properties": {
+            "repository": {
+              "type": "string",
+              "title": "Image Repository",
+              "description": "Frontend container image repository",
+              "default": "quay.io/maximilianopizarro/neuroface-frontend"
+            },
+            "tag": {
+              "type": "string",
+              "title": "Image Tag",
+              "description": "Frontend container image tag",
+              "default": "latest"
+            },
+            "pullPolicy": {
+              "type": "string",
+              "title": "Image Pull Policy",
+              "enum": ["Always", "IfNotPresent", "Never"],
+              "default": "Always"
+            }
+          }
+        },
+        "replicas": {
+          "type": "integer",
+          "title": "Replicas",
+          "description": "Number of frontend pod replicas",
+          "minimum": 1,
+          "default": 1
+        },
+        "port": {
+          "type": "integer",
+          "title": "Port",
+          "description": "Frontend container port",
+          "default": 8080
+        },
+        "resources": {
+          "type": "object",
+          "title": "Resources",
+          "description": "CPU and memory resource limits/requests",
+          "properties": {
+            "limits": {
+              "type": "object",
+              "title": "Limits",
+              "properties": {
+                "cpu": {
+                  "type": "string",
+                  "title": "CPU Limit",
+                  "default": "200m"
+                },
+                "memory": {
+                  "type": "string",
+                  "title": "Memory Limit",
+                  "default": "256Mi"
+                }
+              }
+            },
+            "requests": {
+              "type": "object",
+              "title": "Requests",
+              "properties": {
+                "cpu": {
+                  "type": "string",
+                  "title": "CPU Request",
+                  "default": "50m"
+                },
+                "memory": {
+                  "type": "string",
+                  "title": "Memory Request",
+                  "default": "128Mi"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "chat": {
+      "type": "object",
+      "title": "AI Chat",
+      "description": "Optional AI chat feature powered by KServe/HuggingFace LLM endpoints",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "title": "Enable AI Chat",
+          "description": "Enable the AI facial analysis chat feature",
+          "default": false
+        },
+        "modelEndpoint": {
+          "type": "string",
+          "title": "Model Endpoint",
+          "description": "LLM inference endpoint URL (OpenAI-compatible). Example: https://isvc-granite-31-8b-fp8-predictor.sandbox-shared-models.svc.cluster.local:8443",
+          "default": ""
+        },
+        "modelName": {
+          "type": "string",
+          "title": "Model Name",
+          "description": "Model identifier sent in the API request (e.g. granite-31-8b-fp8)",
+          "default": ""
+        },
+        "apiKey": {
+          "type": "string",
+          "title": "API Key",
+          "description": "Bearer token for the LLM endpoint (optional for internal KServe endpoints)",
+          "default": ""
+        },
+        "maxTokens": {
+          "type": "integer",
+          "title": "Max Tokens",
+          "description": "Maximum tokens in the LLM response",
+          "minimum": 64,
+          "maximum": 4096,
+          "default": 512
+        },
+        "systemPrompt": {
+          "type": "string",
+          "title": "System Prompt",
+          "description": "System prompt for the facial analysis assistant",
+          "default": "You are a facial analysis assistant. Analyze the provided facial detection data and answer questions about expressions, characteristics, and features of the detected faces. Be concise and informative."
+        }
+      }
+    },
+    "route": {
+      "type": "object",
+      "title": "OpenShift Route",
+      "description": "Expose the application via an OpenShift Route",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "title": "Enable Route",
+          "description": "Create an OpenShift Route for external access",
+          "default": true
+        },
+        "host": {
+          "type": "string",
+          "title": "Hostname",
+          "description": "Custom hostname for the route (leave empty for auto-generated)",
+          "default": ""
+        },
+        "tls": {
+          "type": "object",
+          "title": "TLS",
+          "properties": {
+            "termination": {
+              "type": "string",
+              "title": "TLS Termination",
+              "enum": ["edge", "passthrough", "reencrypt"],
+              "default": "edge"
+            }
+          }
+        }
+      }
+    },
+    "persistence": {
+      "type": "object",
+      "title": "Persistence",
+      "description": "Persistent storage for training data and models",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "title": "Enable Persistence",
+          "description": "Use a PersistentVolumeClaim for data storage",
+          "default": true
+        },
+        "size": {
+          "type": "string",
+          "title": "Volume Size",
+          "description": "Size of the persistent volume",
+          "default": "1Gi"
+        },
+        "storageClassName": {
+          "type": "string",
+          "title": "Storage Class",
+          "description": "StorageClass name (leave empty for cluster default)",
+          "default": ""
+        },
+        "accessModes": {
+          "type": "array",
+          "title": "Access Modes",
+          "items": {
+            "type": "string",
+            "enum": ["ReadWriteOnce", "ReadWriteMany", "ReadOnlyMany"]
+          },
+          "default": ["ReadWriteOnce"]
+        }
+      }
+    }
+  }
+}

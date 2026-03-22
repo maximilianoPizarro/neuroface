@@ -52,6 +52,10 @@ import { MatListModule } from '@angular/material/list';
             <mat-icon matListItemIcon>settings</mat-icon>
             <span matListItemTitle>Model Config</span>
           </a>
+          <a mat-list-item routerLink="/chat" routerLinkActive="active-link">
+            <mat-icon matListItemIcon>smart_toy</mat-icon>
+            <span matListItemTitle>AI Chat</span>
+          </a>
         </mat-nav-list>
       </mat-sidenav>
 

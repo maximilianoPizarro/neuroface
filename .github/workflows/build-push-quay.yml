@@ -3,6 +3,7 @@
 #   QUAY_USERNAME, QUAY_PASSWORD (Quay robot account)
 #   REDHAT_REGISTRY_USERNAME, REDHAT_REGISTRY_PASSWORD (Red Hat registry for UBI base images)
 # Optional: QUAY_NAMESPACE (default: maximilianopizarro)
+#           INSTALL_DLIB (default: false) — set to "true" to include face_recognition/dlib
 
 name: Build and push to Quay.io
 
@@ -10,6 +11,13 @@ on:
   push:
     branches: [main, master]
   workflow_dispatch:
+    inputs:
+      install_dlib:
+        description: 'Install dlib/face_recognition in backend image'
+        required: false
+        default: 'false'
+        type: choice
+        options: ['false', 'true']
 
 env:
   QUAY_REGISTRY: quay.io
@@ -54,6 +62,8 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
+          build-args: |
+            INSTALL_DLIB=${{ github.event.inputs.install_dlib || 'false' }}
           tags: |
             ${{ env.QUAY_REGISTRY }}/${{ env.QUAY_NAMESPACE }}/neuroface-backend:latest
             ${{ env.QUAY_REGISTRY }}/${{ env.QUAY_NAMESPACE }}/neuroface-backend:${{ github.sha }}

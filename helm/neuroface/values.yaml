@@ -13,6 +13,7 @@ backend:
       cpu: 100m
       memory: 256Mi
   aiModel: lbph
+  dlibEnabled: false
 
 frontend:
   image:
@@ -28,6 +29,14 @@ frontend:
     requests:
       cpu: 50m
       memory: 128Mi
+
+chat:
+  enabled: false
+  modelEndpoint: ""
+  modelName: ""
+  apiKey: ""
+  maxTokens: 512
+  systemPrompt: "You are a facial analysis assistant. Analyze the provided facial detection data and answer questions about expressions, characteristics, and features of the detected faces. Be concise and informative."
 
 route:
   enabled: true

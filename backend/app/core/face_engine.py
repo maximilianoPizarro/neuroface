@@ -16,6 +16,14 @@ from app.models.base import FaceRecognitionModel
 logger = logging.getLogger(__name__)
 
 
+def _load_cascade(filename: str) -> Optional[cv2.CascadeClassifier]:
+    path = os.path.join(CASCADES_DIR, filename)
+    if os.path.exists(path):
+        return cv2.CascadeClassifier(path)
+    logger.warning("Cascade not found, skipping: %s", path)
+    return None
+
+
 class FaceEngine:
     def __init__(self):
         cascade_path = os.path.join(CASCADES_DIR, settings.cascade_face)
@@ -27,11 +35,10 @@ class FaceEngine:
             )
         self.face_cascade = cv2.CascadeClassifier(cascade_path)
 
-        eye_cascade_path = os.path.join(CASCADES_DIR, settings.cascade_eye)
-        if os.path.exists(eye_cascade_path):
-            self.eye_cascade = cv2.CascadeClassifier(eye_cascade_path)
-        else:
-            self.eye_cascade = None
+        self.eye_cascade = _load_cascade(settings.cascade_eye)
+        self.smile_cascade = _load_cascade(settings.cascade_smile)
+        self.profile_cascade = _load_cascade(settings.cascade_profile)
+        self.eye_glasses_cascade = _load_cascade(settings.cascade_eye_glasses)
 
         self._model: Optional[FaceRecognitionModel] = None
         self._labels: dict[int, str] = {}
@@ -97,6 +104,62 @@ class FaceEngine:
             else:
                 face_info["label"] = "unknown"
                 face_info["confidence"] = 0.0
+
+            results.append(face_info)
+
+        return results
+
+    def analyze_faces(self, image: np.ndarray) -> list[dict]:
+        """Full facial analysis using all available cascades."""
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        faces = self.face_cascade.detectMultiScale(
+            gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30),
+        )
+
+        results = []
+        for x, y, w, h in faces:
+            roi_gray = gray[y : y + h, x : x + w]
+            face_info: dict = {
+                "x": int(x), "y": int(y), "w": int(w), "h": int(h),
+                "features": {},
+            }
+
+            if self._is_trained and self._model:
+                id_, conf = self._model.predict(roi_gray)
+                if 4 <= conf <= 85:
+                    face_info["label"] = self._labels.get(id_, "unknown")
+                else:
+                    face_info["label"] = "unknown"
+                face_info["confidence"] = round(float(conf), 2)
+            else:
+                face_info["label"] = "unknown"
+                face_info["confidence"] = 0.0
+
+            if self.eye_cascade is not None:
+                eyes = self.eye_cascade.detectMultiScale(roi_gray, scaleFactor=1.1, minNeighbors=5)
+                face_info["features"]["eyes_detected"] = len(eyes)
+
+            if self.eye_glasses_cascade is not None:
+                glasses = self.eye_glasses_cascade.detectMultiScale(
+                    roi_gray, scaleFactor=1.1, minNeighbors=5,
+                )
+                face_info["features"]["glasses_detected"] = len(glasses) > 0
+
+            if self.smile_cascade is not None:
+                smiles = self.smile_cascade.detectMultiScale(
+                    roi_gray, scaleFactor=1.8, minNeighbors=20, minSize=(25, 25),
+                )
+                face_info["features"]["smile_detected"] = len(smiles) > 0
+
+            if self.profile_cascade is not None:
+                profiles = self.profile_cascade.detectMultiScale(
+                    roi_gray, scaleFactor=1.1, minNeighbors=3,
+                )
+                face_info["features"]["profile_face"] = len(profiles) > 0
+
+            face_info["features"]["face_width"] = int(w)
+            face_info["features"]["face_height"] = int(h)
+            face_info["features"]["aspect_ratio"] = round(float(w) / float(h), 2)
 
             results.append(face_info)
 

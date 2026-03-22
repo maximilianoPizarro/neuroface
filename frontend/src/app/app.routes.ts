@@ -27,4 +27,9 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./components/model-config/model-config.component').then(m => m.ModelConfigComponent),
   },
+  {
+    path: 'chat',
+    loadComponent: () =>
+      import('./components/chat/chat.component').then(m => m.ChatComponent),
+  },
 ];

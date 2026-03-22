@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -7,19 +8,23 @@ from app.core.config import settings
 from app.core.face_engine import FaceEngine
 from app.models.lbph_model import LBPHModel
 
+logger = logging.getLogger(__name__)
+
 face_engine = FaceEngine()
 
 
 def _init_model(engine: FaceEngine, model_type: str):
-    if model_type == "dlib":
+    if model_type == "dlib" and settings.dlib_enabled:
         from app.models.dlib_model import DlibModel, DLIB_AVAILABLE
 
         if not DLIB_AVAILABLE:
-            print("WARNING: dlib not available, falling back to LBPH")
+            logger.warning("dlib package not installed, falling back to LBPH")
             engine.model = LBPHModel()
         else:
             engine.model = DlibModel()
     else:
+        if model_type == "dlib" and not settings.dlib_enabled:
+            logger.warning("dlib requested but NEUROFACE_DLIB_ENABLED=false, using LBPH")
         engine.model = LBPHModel()
 
 
@@ -47,9 +52,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from app.api import health, recognition, training, models  # noqa: E402
+from app.api import health, recognition, training, models, analysis, chat  # noqa: E402
 
 app.include_router(health.router)
 app.include_router(recognition.router)
 app.include_router(training.router)
 app.include_router(models.router)
+app.include_router(analysis.router)
+app.include_router(chat.router)

@@ -53,8 +53,6 @@ sed -i "s/^appVersion:.*/appVersion: \"${new_app_version}\"/" "$CHART_FILE"
 
 echo "=== Chart.yaml updated ==="
 
-rm -f "${DOCS_DIR}"/neuroface-*.tgz
-
 echo "=== Packaging Helm chart ==="
 helm package "$CHART_DIR" --destination "$DOCS_DIR"
 

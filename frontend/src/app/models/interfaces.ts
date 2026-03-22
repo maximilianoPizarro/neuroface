@@ -22,6 +22,7 @@ export interface ReadyResponse {
   status: string;
   model_loaded: boolean;
   ai_model: string;
+  chat_enabled: boolean;
 }
 
 export interface TrainResponse {
@@ -50,6 +51,7 @@ export interface ModelConfigResponse {
   ai_model: string;
   is_trained: boolean;
   model_info: ModelInfo;
+  chat_enabled: boolean;
 }
 
 export interface LabelImages {
@@ -61,4 +63,47 @@ export interface LabelImages {
 export interface LabelsResponse {
   labels: string[];
   count: number;
+}
+
+export interface ChatStatusResponse {
+  enabled: boolean;
+  model_endpoint: string | null;
+  model_name: string | null;
+}
+
+export interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+  analysis?: AnalysisResult | null;
+  timestamp: Date;
+}
+
+export interface ChatResponse {
+  response: string;
+  analysis: AnalysisResult | null;
+}
+
+export interface AnalysisResult {
+  faces: AnalyzedFace[];
+  count: number;
+}
+
+export interface AnalyzedFace {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  label: string;
+  confidence: number;
+  features: FaceFeatures;
+}
+
+export interface FaceFeatures {
+  eyes_detected?: number;
+  glasses_detected?: boolean;
+  smile_detected?: boolean;
+  profile_face?: boolean;
+  face_width?: number;
+  face_height?: number;
+  aspect_ratio?: number;
 }

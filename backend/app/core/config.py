@@ -7,10 +7,11 @@ CASCADES_DIR = os.path.join(_APP_DIR, "resources", "cascades")
 
 class Settings(BaseSettings):
     app_name: str = "NeuroFace API"
-    app_version: str = "1.0.0"
+    app_version: str = "1.0.1"
     debug: bool = False
 
     ai_model: str = "lbph"
+    dlib_enabled: bool = False
     data_dir: str = os.path.join(_APP_DIR, "resources", "data")
 
     images_dir: str = ""
@@ -20,8 +21,22 @@ class Settings(BaseSettings):
 
     cascade_face: str = "haarcascade_frontalface_alt2.xml"
     cascade_eye: str = "haarcascade_eye.xml"
+    cascade_smile: str = "haarcascade_smile.xml"
+    cascade_profile: str = "haarcascade_profileface.xml"
+    cascade_eye_glasses: str = "haarcascade_eye_tree_eyeglasses.xml"
 
     cors_allowed_origins: str = "*"
+
+    chat_enabled: bool = False
+    chat_model_endpoint: str = ""
+    chat_model_name: str = ""
+    chat_api_key: str = ""
+    chat_max_tokens: int = 512
+    chat_system_prompt: str = (
+        "You are a facial analysis assistant. Analyze the provided facial detection "
+        "data and answer questions about expressions, characteristics, and features "
+        "of the detected faces. Be concise and informative."
+    )
 
     class Config:
         env_prefix = "NEUROFACE_"
