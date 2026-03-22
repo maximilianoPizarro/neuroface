@@ -11,6 +11,8 @@ data:
   NEUROFACE_CHAT_ENABLED: {{ .Values.chat.enabled | quote }}
   NEUROFACE_CHAT_MODEL_ENDPOINT: {{ .Values.chat.modelEndpoint | quote }}
   NEUROFACE_CHAT_MODEL_NAME: {{ .Values.chat.modelName | quote }}
+  {{- if and .Values.chat.apiKey (not .Values.chat.autoServiceAccount) }}
   NEUROFACE_CHAT_API_KEY: {{ .Values.chat.apiKey | quote }}
+  {{- end }}
   NEUROFACE_CHAT_MAX_TOKENS: {{ .Values.chat.maxTokens | quote }}
   NEUROFACE_CHAT_SYSTEM_PROMPT: {{ .Values.chat.systemPrompt | quote }}

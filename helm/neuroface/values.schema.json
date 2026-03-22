@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "NeuroFace Helm Chart Values",
-  "description": "Facial Recognition Webapp with ML — FastAPI backend + Angular frontend on Red Hat UBI9",
+  "description": "Facial Recognition Webapp with ML - FastAPI backend + Angular frontend on Red Hat UBI9",
   "type": "object",
   "properties": {
     "backend": {
@@ -209,8 +209,14 @@
         "apiKey": {
           "type": "string",
           "title": "API Key",
-          "description": "Bearer token for the LLM endpoint (optional for internal KServe endpoints)",
+          "description": "Bearer token for the LLM endpoint (ignored when autoServiceAccount is enabled)",
           "default": ""
+        },
+        "autoServiceAccount": {
+          "type": "boolean",
+          "title": "Auto Service Account",
+          "description": "Create a ServiceAccount and inject its token for KServe OAuth authentication automatically",
+          "default": true
         },
         "maxTokens": {
           "type": "integer",

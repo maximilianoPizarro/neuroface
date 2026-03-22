@@ -14,6 +14,9 @@ spec:
       labels:
         {{- include "neuroface.backendLabels" . | nindent 8 }}
     spec:
+      {{- if and .Values.chat.enabled .Values.chat.autoServiceAccount }}
+      serviceAccountName: {{ include "neuroface.fullname" . }}-chat
+      {{- end }}
       containers:
         - name: backend
           image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
@@ -24,6 +27,14 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ include "neuroface.fullname" . }}-config
+          {{- if and .Values.chat.enabled .Values.chat.autoServiceAccount }}
+          env:
+            - name: NEUROFACE_CHAT_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "neuroface.fullname" . }}-chat-token
+                  key: token
+          {{- end }}
           resources:
             {{- toYaml .Values.backend.resources | nindent 12 }}
           livenessProbe:

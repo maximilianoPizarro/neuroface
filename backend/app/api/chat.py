@@ -68,7 +68,12 @@ async def chat(req: ChatRequest):
     ]
 
     endpoint = settings.chat_model_endpoint.rstrip("/")
-    url = f"{endpoint}/v1/chat/completions"
+    if endpoint.endswith("/v1"):
+        url = f"{endpoint}/chat/completions"
+    else:
+        url = f"{endpoint}/v1/chat/completions"
+
+    logger.info("Calling LLM endpoint: %s", url)
 
     headers = {"Content-Type": "application/json"}
     if settings.chat_api_key:
@@ -83,12 +88,14 @@ async def chat(req: ChatRequest):
         payload["model"] = settings.chat_model_name
 
     try:
-        async with httpx.AsyncClient(verify=False, timeout=60.0) as client:
+        async with httpx.AsyncClient(
+            verify=False, timeout=60.0, follow_redirects=True
+        ) as client:
             resp = await client.post(url, json=payload, headers=headers)
             resp.raise_for_status()
             data = resp.json()
     except httpx.HTTPStatusError as e:
-        logger.error("LLM endpoint returned %s: %s", e.response.status_code, e.response.text)
+        logger.error("LLM endpoint returned %s: %s", e.response.status_code, e.response.text[:500])
         raise HTTPException(
             status_code=502,
             detail=f"LLM endpoint error: {e.response.status_code}",

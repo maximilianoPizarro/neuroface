@@ -19,7 +19,7 @@ async def list_available_models():
             "type": "lbph",
             "name": "OpenCV LBPH",
             "available": True,
-            "description": "Local Binary Patterns Histograms — fast, lightweight, default model.",
+            "description": "Local Binary Patterns Histograms - fast, lightweight, default model.",
         },
         {
             "type": "dlib",

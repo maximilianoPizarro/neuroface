@@ -35,6 +35,7 @@ chat:
   modelEndpoint: ""
   modelName: ""
   apiKey: ""
+  autoServiceAccount: true
   maxTokens: 512
   systemPrompt: "You are a facial analysis assistant. Analyze the provided facial detection data and answer questions about expressions, characteristics, and features of the detected faces. Be concise and informative."
 

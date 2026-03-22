@@ -1,4 +1,4 @@
-"""OpenCV LBPH Face Recognizer — default model from the reconocimiento-facial archetype."""
+"""OpenCV LBPH Face Recognizer - default model from the reconocimiento-facial archetype."""
 
 from typing import Any
 
