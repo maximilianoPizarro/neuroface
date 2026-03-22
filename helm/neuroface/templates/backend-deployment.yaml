@@ -4,6 +4,8 @@ metadata:
   name: {{ include "neuroface.fullname" . }}-backend
   labels:
     {{- include "neuroface.backendLabels" . | nindent 4 }}
+  annotations:
+    {{- include "neuroface.backendAnnotations" . | nindent 4 }}
 spec:
   replicas: {{ .Values.backend.replicas }}
   selector:

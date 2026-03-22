@@ -2,12 +2,13 @@ import { Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild, Afte
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { CameraService } from '../../services/camera.service';
 
 @Component({
   selector: 'app-camera',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule],
+  imports: [CommonModule, MatButtonModule, MatIconModule, MatTooltipModule],
   template: `
     <div class="camera-wrapper">
       <video #videoEl autoplay playsinline muted></video>
@@ -18,11 +19,18 @@ import { CameraService } from '../../services/camera.service';
         <mat-icon>{{ active ? 'videocam_off' : 'videocam' }}</mat-icon>
         {{ active ? 'Stop' : 'Start Camera' }}
       </button>
+      <button mat-icon-button (click)="flipCamera()" [disabled]="!active || !cameraService.hasMultipleCameras"
+              matTooltip="Switch camera (front/rear)">
+        <mat-icon>flip_camera_ios</mat-icon>
+      </button>
       <button mat-raised-button (click)="capture()" [disabled]="!active">
         <mat-icon>photo_camera</mat-icon>
         Capture
       </button>
     </div>
+    <p class="camera-mode" *ngIf="active">
+      {{ cameraService.facingMode === 'user' ? 'Front camera' : 'Rear camera' }}
+    </p>
     <p class="error-msg" *ngIf="errorMsg">{{ errorMsg }}</p>
   `,
   styles: [`
@@ -32,9 +40,11 @@ import { CameraService } from '../../services/camera.service';
       background: #000;
       border-radius: 8px;
       overflow: hidden;
+      width: 100%;
     }
     video {
       display: block;
+      width: 100%;
       max-width: 640px;
     }
     .overlay-canvas {
@@ -45,8 +55,14 @@ import { CameraService } from '../../services/camera.service';
     }
     .camera-controls {
       display: flex;
+      align-items: center;
       gap: 8px;
       margin-top: 12px;
+    }
+    .camera-mode {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
     }
     .error-msg {
       color: #d32f2f;
@@ -64,7 +80,7 @@ export class CameraComponent implements AfterViewInit, OnDestroy {
   starting = false;
   errorMsg = '';
 
-  constructor(private cameraService: CameraService) {}
+  constructor(public cameraService: CameraService) {}
 
   ngAfterViewInit(): void {
     this.cameraService.errors$.subscribe(err => (this.errorMsg = err));
@@ -92,6 +108,19 @@ export class CameraComponent implements AfterViewInit, OnDestroy {
       } finally {
         this.starting = false;
       }
+    }
+  }
+
+  async flipCamera(): Promise<void> {
+    if (!this.active) return;
+    this.starting = true;
+    try {
+      await this.cameraService.switchCamera(this.videoRef.nativeElement);
+      this.syncCanvasSize();
+    } catch {
+      this.errorMsg = 'Failed to switch camera';
+    } finally {
+      this.starting = false;
     }
   }
 

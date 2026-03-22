@@ -5,10 +5,31 @@ import { Observable, Subject } from 'rxjs';
 export class CameraService {
   private stream: MediaStream | null = null;
   private errorSubject = new Subject<string>();
+  private _facingMode: 'user' | 'environment' = 'user';
+  private _hasMultipleCameras = false;
 
   errors$ = this.errorSubject.asObservable();
 
-  async startCamera(video: HTMLVideoElement, facingMode = 'user'): Promise<void> {
+  get facingMode(): 'user' | 'environment' {
+    return this._facingMode;
+  }
+
+  get hasMultipleCameras(): boolean {
+    return this._hasMultipleCameras;
+  }
+
+  async checkMultipleCameras(): Promise<boolean> {
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      this._hasMultipleCameras = devices.filter(d => d.kind === 'videoinput').length > 1;
+    } catch {
+      this._hasMultipleCameras = false;
+    }
+    return this._hasMultipleCameras;
+  }
+
+  async startCamera(video: HTMLVideoElement, facingMode: 'user' | 'environment' = 'user'): Promise<void> {
+    this._facingMode = facingMode;
     try {
       this.stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode, width: { ideal: 640 }, height: { ideal: 480 } },
@@ -16,10 +37,17 @@ export class CameraService {
       });
       video.srcObject = this.stream;
       await video.play();
+      await this.checkMultipleCameras();
     } catch (err) {
       this.errorSubject.next(`Camera access denied or unavailable: ${err}`);
       throw err;
     }
+  }
+
+  async switchCamera(video: HTMLVideoElement): Promise<void> {
+    const newMode = this._facingMode === 'user' ? 'environment' : 'user';
+    this.stopCamera(video);
+    await this.startCamera(video, newMode);
   }
 
   stopCamera(video: HTMLVideoElement): void {

@@ -72,12 +72,20 @@ import { ChatMessage, ChatStatusResponse } from '../../models/interfaces';
                 <mat-icon>{{ cameraActive ? 'videocam_off' : 'videocam' }}</mat-icon>
                 {{ cameraActive ? 'Stop' : 'Start' }} Camera
               </button>
+              <button mat-icon-button (click)="flipCamera()"
+                      [disabled]="!cameraActive || !camera.hasMultipleCameras"
+                      matTooltip="Switch camera (front/rear)">
+                <mat-icon>flip_camera_ios</mat-icon>
+              </button>
               <button mat-raised-button color="accent"
                       [disabled]="!cameraActive" (click)="captureSnapshot()">
                 <mat-icon>photo_camera</mat-icon>
                 Capture
               </button>
             </mat-card-actions>
+            <p class="camera-mode" *ngIf="cameraActive">
+              {{ camera.facingMode === 'user' ? 'Front camera' : 'Rear camera' }}
+            </p>
           </mat-card>
         </div>
 
@@ -223,6 +231,7 @@ import { ChatMessage, ChatStatusResponse } from '../../models/interfaces';
       right: 4px;
     }
     .hidden { display: none; }
+    .camera-mode { font-size: 12px; color: #666; margin: 4px 16px 0; }
     .messages-panel {
       flex: 1;
       display: flex;
@@ -340,7 +349,7 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   constructor(
     private api: ApiService,
-    private camera: CameraService,
+    public camera: CameraService,
   ) {}
 
   ngOnInit(): void {
@@ -366,6 +375,13 @@ export class ChatComponent implements OnInit, OnDestroy {
         this.cameraActive = true;
       } catch { /* handled by camera service */ }
     }
+  }
+
+  async flipCamera(): Promise<void> {
+    if (!this.cameraActive) return;
+    try {
+      await this.camera.switchCamera(this.videoRef.nativeElement);
+    } catch { /* handled by camera service */ }
   }
 
   captureSnapshot(): void {

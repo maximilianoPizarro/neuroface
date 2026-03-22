@@ -37,6 +37,12 @@ Backend labels
 {{ include "neuroface.labels" . }}
 app.kubernetes.io/name: {{ include "neuroface.fullname" . }}-backend
 app.kubernetes.io/component: backend
+{{- end }}
+
+{{/*
+Backend annotations (OpenShift Topology)
+*/}}
+{{- define "neuroface.backendAnnotations" -}}
 app.openshift.io/runtime: python
 {{- end }}
 
@@ -47,5 +53,12 @@ Frontend labels
 {{ include "neuroface.labels" . }}
 app.kubernetes.io/name: {{ include "neuroface.fullname" . }}-frontend
 app.kubernetes.io/component: frontend
+{{- end }}
+
+{{/*
+Frontend annotations (OpenShift Topology)
+*/}}
+{{- define "neuroface.frontendAnnotations" -}}
+app.openshift.io/connects-to: '[{"apiVersion":"apps/v1","kind":"Deployment","name":"{{ include "neuroface.fullname" . }}-backend"}]'
 app.openshift.io/runtime: angularjs
 {{- end }}
