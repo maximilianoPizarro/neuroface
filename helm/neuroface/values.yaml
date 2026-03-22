@@ -31,9 +31,9 @@ frontend:
       memory: 128Mi
 
 chat:
-  enabled: false
-  modelEndpoint: ""
-  modelName: ""
+  enabled: true
+  modelEndpoint: "https://isvc-granite-31-8b-fp8-predictor.sandbox-shared-models.svc.cluster.local:8443"
+  modelName: "isvc-granite-31-8b-fp8"
   apiKey: ""
   autoServiceAccount: true
   maxTokens: 512
