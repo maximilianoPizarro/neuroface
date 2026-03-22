@@ -106,7 +106,7 @@ import { ChatMessage, ChatStatusResponse } from '../../models/interfaces';
                 <div class="message-content">{{ msg.content }}</div>
                 <div *ngIf="msg.analysis?.count" class="analysis-badge">
                   <mat-icon>face</mat-icon>
-                  {{ msg.analysis.count }} face(s) analyzed
+                  {{ msg.analysis?.count }} face(s) analyzed
                 </div>
                 <div class="message-time">
                   {{ msg.timestamp | date:'HH:mm' }}

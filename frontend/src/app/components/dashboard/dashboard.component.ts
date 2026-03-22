@@ -107,7 +107,7 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     this.api.ready().subscribe({
       next: (r) => (this.ready = r),
-      error: () => (this.ready = { status: 'error', model_loaded: false, ai_model: 'unknown' }),
+      error: () => (this.ready = { status: 'error', model_loaded: false, ai_model: 'unknown', chat_enabled: false }),
     });
   }
 }
