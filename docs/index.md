@@ -30,6 +30,17 @@ NeuroFace is a facial recognition and object detection web application built wit
 - **Experimental badge** moved to footer only (removed from toolbar)
 - **New sidebar navigation** includes Object Detection link
 
+### Video Demos
+
+<div style="display: flex; gap: 16px; flex-wrap: wrap; margin: 16px 0;">
+  <div style="flex: 1; min-width: 280px;">
+    <iframe width="100%" height="315" src="https://www.youtube.com/embed/lvFu5u7slXg" title="NeuroFace Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  </div>
+  <div style="flex: 0 0 200px;">
+    <iframe width="200" height="356" src="https://www.youtube.com/embed/E52h4-aS5Rg" title="NeuroFace Mobile Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  </div>
+</div>
+
 ### Screenshots
 
 #### Dashboard
