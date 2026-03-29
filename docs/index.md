@@ -50,6 +50,26 @@ NeuroFace is a facial recognition and object detection web application built wit
 #### AI Face Analysis Chat
 ![Chat](screenshots/chat.png)
 
+#### OpenShift AI — Model Server
+![OpenShift AI](screenshots/rhoia.png)
+![OpenShift AI Model](screenshots/rhoia2.png)
+
+#### OpenShift Topology
+![Topology](screenshots/topology.png)
+
+#### Helm Chart Install
+![Helm Install](screenshots/neuroface-helm.png)
+![Helm Resources](screenshots/neuroface-helm2.png)
+
+#### Helm Repository
+![Helm Repository](screenshots/helm-repository.png)
+
+#### Dashboard v1.1.0
+![Dashboard v1.1.0](screenshots/dashboard-v110.png)
+
+#### Model Config v1.1.0
+![Model Config](screenshots/model-config-v110.png)
+
 ## Architecture
 
 ### System Overview
@@ -197,17 +217,41 @@ helm install neuroface neuroface/neuroface \
 
 ## Deploying OpenVINO on Red Hat Developer Sandbox
 
-This guide explains how to deploy the `face-detection-retail-0005` model on **OpenShift AI (RHOAI)** in a **Red Hat Developer Sandbox** so that NeuroFace can use it for remote face detection.
+This guide explains how to deploy `face-detection-retail-0005` on **OpenShift AI (RHOAI)** in a **Red Hat Developer Sandbox** so that NeuroFace can use it for remote face detection.
 
-### Prerequisites
+> The Helm chart includes all ModelMesh resources (ServingRuntime, PVC, Secret, download Job, InferenceService) as templates. Enable them with `--set ovms.modelmesh.enabled=true` for a single-command deployment.
 
-- A [Red Hat Developer Sandbox](https://developers.redhat.com/developer-sandbox) account
-- `oc` CLI logged in to your sandbox
-- OpenShift AI (RHOAI) enabled in your sandbox (enabled by default)
+### Option A: Automated (Helm chart deploys everything)
 
-### Step 1: Create the ServingRuntime
+```bash
+helm repo add neuroface https://maximilianopizarro.github.io/neuroface/
+helm install neuroface neuroface/neuroface \
+  --set ovms.externalUrl=http://modelmesh-serving:8008 \
+  --set ovms.modelName=face-detection-retail-0005 \
+  --set ovms.modelmesh.enabled=true
+```
 
-The ServingRuntime defines the OpenVINO Model Server container that will serve models.
+This single command deploys:
+- **Frontend** + **Backend** + **PVC** (training data)
+- **ServingRuntime** — OpenVINO adapter for ModelMesh
+- **PVC** (2Gi) — Model storage
+- **storage-config Secret** — Tells ModelMesh to use the PVC
+- **Job** (post-install hook) — Downloads `face-detection-retail-0005` (FP16) from Intel Open Model Zoo
+- **InferenceService** (post-install hook) — Registers the model on ModelMesh
+
+Wait for the model download job and verify:
+
+```bash
+oc wait --for=condition=complete job/neuroface-download-model --timeout=300s
+oc logs job/neuroface-download-model
+oc wait --for=condition=Ready inferenceservice/face-detection-retail-0005 --timeout=300s
+```
+
+### Option B: Manual steps (for custom setups)
+
+If you prefer to deploy ModelMesh resources manually or your cluster needs specific configuration:
+
+#### Step 1: Create the ServingRuntime
 
 ```bash
 oc apply -f - <<'EOF'
@@ -255,7 +299,7 @@ spec:
 EOF
 ```
 
-### Step 2: Create a PVC for Model Storage
+#### Step 2: Create PVC + Storage Secret
 
 ```bash
 oc apply -f - <<'EOF'
@@ -264,37 +308,22 @@ kind: PersistentVolumeClaim
 metadata:
   name: neuroface-models
 spec:
-  accessModes:
-    - ReadWriteOnce
+  accessModes: [ReadWriteOnce]
   resources:
     requests:
       storage: 2Gi
-  storageClassName: gp3
-EOF
-```
-
-### Step 3: Configure ModelMesh Storage
-
-Create the `storage-config` secret that tells ModelMesh where to find models:
-
-```bash
-oc apply -f - <<'EOF'
+---
 apiVersion: v1
 kind: Secret
 metadata:
   name: storage-config
 stringData:
   neuroface-models: |
-    {
-      "type": "pvc",
-      "name": "neuroface-models"
-    }
+    { "type": "pvc", "name": "neuroface-models" }
 EOF
 ```
 
-### Step 4: Download the Face Detection Model
-
-This Job downloads Intel's `face-detection-retail-0005` model (OpenVINO IR, FP16) from the Open Model Zoo:
+#### Step 3: Download the Model
 
 ```bash
 oc apply -f - <<'EOF'
@@ -303,44 +332,34 @@ kind: Job
 metadata:
   name: download-face-model
 spec:
+  backoffLimit: 2
   template:
     spec:
       containers:
         - name: downloader
           image: registry.access.redhat.com/ubi9/python-311:latest
-          command:
-            - bash
-            - -c
+          command: ["bash", "-c"]
+          args:
             - |
               pip install openvino-dev[onnx,tensorflow] > /dev/null 2>&1
-              omz_downloader --name face-detection-retail-0005 --precision FP16 \
-                -o /tmp/models
+              omz_downloader --name face-detection-retail-0005 --precision FP16 -o /tmp/models
               mkdir -p /models/face-detection-retail-0005/1
-              cp /tmp/models/intel/face-detection-retail-0005/FP16/* \
-                /models/face-detection-retail-0005/1/
+              cp /tmp/models/intel/face-detection-retail-0005/FP16/* /models/face-detection-retail-0005/1/
               ls -la /models/face-detection-retail-0005/1/
           volumeMounts:
-            - name: model-storage
-              mountPath: /models
+            - { name: model-storage, mountPath: /models }
       volumes:
         - name: model-storage
-          persistentVolumeClaim:
-            claimName: neuroface-models
+          persistentVolumeClaim: { claimName: neuroface-models }
       restartPolicy: Never
-  backoffLimit: 2
 EOF
 ```
 
-Wait for the job to complete:
-
 ```bash
 oc wait --for=condition=complete job/download-face-model --timeout=300s
-oc logs job/download-face-model
 ```
 
-You should see `face-detection-retail-0005.xml` and `.bin` files listed.
-
-### Step 5: Deploy the InferenceService
+#### Step 4: Deploy InferenceService
 
 ```bash
 oc apply -f - <<'EOF'
@@ -362,20 +381,26 @@ spec:
 EOF
 ```
 
-Wait for the model to load:
-
 ```bash
 oc wait --for=condition=Ready inferenceservice/face-detection-retail-0005 --timeout=300s
 ```
 
-### Step 6: Verify the Model
+#### Step 5: Deploy NeuroFace (without modelmesh templates)
+
+```bash
+helm install neuroface neuroface/neuroface \
+  --set ovms.externalUrl=http://modelmesh-serving:8008 \
+  --set ovms.modelName=face-detection-retail-0005
+```
+
+### Verify
 
 ```bash
 oc exec deployment/neuroface-backend -- \
   curl -s http://modelmesh-serving:8008/v2/models/face-detection-retail-0005
 ```
 
-Expected output:
+Expected:
 
 ```json
 {
@@ -385,17 +410,6 @@ Expected output:
   "outputs": [{"name": "527", "datatype": "FP32", "shape": ["1","1","200","7"]}]
 }
 ```
-
-### Step 7: Deploy NeuroFace
-
-```bash
-helm repo add neuroface https://maximilianopizarro.github.io/neuroface/
-helm install neuroface neuroface/neuroface \
-  --set ovms.externalUrl=http://modelmesh-serving:8008 \
-  --set ovms.modelName=face-detection-retail-0005
-```
-
-The backend auto-detects the model's input/output tensor names from the OVMS metadata endpoint.
 
 ---
 

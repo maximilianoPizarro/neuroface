@@ -1,0 +1,54 @@
+{{- if and .Values.ovms.enabled .Values.ovms.externalUrl .Values.ovms.modelmesh.enabled }}
+apiVersion: serving.kserve.io/v1alpha1
+kind: ServingRuntime
+metadata:
+  name: {{ include "neuroface.fullname" . }}
+  labels:
+    {{- include "neuroface.labels" . | nindent 4 }}
+    opendatahub.io/dashboard: "true"
+  annotations:
+    openshift.io/display-name: "NeuroFace OpenVINO Runtime"
+    opendatahub.io/runtime-version: v2025.2.1
+spec:
+  supportedModelFormats:
+    - name: openvino_ir
+      version: opset1
+      autoSelect: true
+    - name: onnx
+      version: "1"
+      autoSelect: true
+    - name: tensorflow
+      version: "2"
+      autoSelect: true
+  multiModel: true
+  protocolVersions:
+    - grpc-v1
+  replicas: 1
+  grpcDataEndpoint: port:8001
+  grpcEndpoint: port:8085
+  containers:
+    - name: ovms
+      image: {{ .Values.ovms.modelmesh.adapterImage }}
+      args:
+        - --port=8001
+        - --rest_port=8888
+        - --config_path=/models/model_config_list.json
+        - --file_system_poll_wait_seconds=0
+        - --grpc_bind_address=0.0.0.0
+        - --rest_bind_address=0.0.0.0
+      resources:
+        requests:
+          cpu: {{ .Values.ovms.modelmesh.resources.requests.cpu | default "500m" }}
+          memory: {{ .Values.ovms.modelmesh.resources.requests.memory | default "3Gi" }}
+        limits:
+          cpu: {{ .Values.ovms.modelmesh.resources.limits.cpu | default "2" | quote }}
+          memory: {{ .Values.ovms.modelmesh.resources.limits.memory | default "3Gi" }}
+  builtInAdapter:
+    serverType: ovms
+    runtimeManagementPort: 8888
+    memBufferBytes: 134217728
+    modelLoadingTimeoutMillis: 90000
+    env:
+      - name: OVMS_FORCE_TARGET_DEVICE
+        value: AUTO
+{{- end }}

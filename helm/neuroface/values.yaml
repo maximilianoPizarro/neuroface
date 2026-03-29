@@ -68,6 +68,21 @@ ovms:
   #   - name: face-detection
   #     path: /models/face-detection
   #     layout: "NCHW:NHWC"
+  modelmesh:
+    enabled: false
+    adapterImage: "registry.redhat.io/rhoai/odh-openvino-model-server-rhel9@sha256:906d7d4d8d06a09ac5060220dc23c8ac8d7f2fd54445b9b9b42b0dd1af14e488"
+    resources:
+      requests:
+        cpu: 500m
+        memory: 3Gi
+      limits:
+        cpu: "2"
+        memory: 3Gi
+    storage:
+      size: 2Gi
+      storageClassName: ""
+    downloadJob:
+      image: "registry.access.redhat.com/ubi9/python-311:latest"
 
 litellm:
   enabled: false

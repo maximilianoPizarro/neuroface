@@ -1,0 +1,45 @@
+{{- if and .Values.ovms.enabled .Values.ovms.externalUrl .Values.ovms.modelmesh.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "neuroface.fullname" . }}-download-model
+  labels:
+    {{- include "neuroface.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      containers:
+        - name: downloader
+          image: {{ .Values.ovms.modelmesh.downloadJob.image | default "registry.access.redhat.com/ubi9/python-311:latest" }}
+          command:
+            - bash
+            - -c
+            - |
+              pip install openvino-dev[onnx,tensorflow] > /dev/null 2>&1
+              omz_downloader --name {{ .Values.ovms.modelName }} --precision FP16 \
+                -o /tmp/models
+              mkdir -p /models/{{ .Values.ovms.modelName }}/1
+              cp /tmp/models/intel/{{ .Values.ovms.modelName }}/FP16/* \
+                /models/{{ .Values.ovms.modelName }}/1/
+              ls -la /models/{{ .Values.ovms.modelName }}/1/
+          volumeMounts:
+            - name: model-storage
+              mountPath: /models
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: "2"
+              memory: 2Gi
+      volumes:
+        - name: model-storage
+          persistentVolumeClaim:
+            claimName: {{ include "neuroface.fullname" . }}-models
+      restartPolicy: Never
+{{- end }}

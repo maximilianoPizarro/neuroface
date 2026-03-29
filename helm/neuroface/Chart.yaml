@@ -2,7 +2,7 @@ apiVersion: v2
 name: neuroface
 description: Facial Recognition Webapp with ML - FastAPI backend + Angular frontend on Red Hat UBI9 with OpenVINO Model Server
 type: application
-version: 1.2.0
+version: 1.2.1
 appVersion: "1.2.0"
 maintainers:
   - name: maximilianoPizarro

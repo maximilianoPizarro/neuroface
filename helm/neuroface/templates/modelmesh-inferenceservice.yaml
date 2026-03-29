@@ -1,0 +1,21 @@
+{{- if and .Values.ovms.enabled .Values.ovms.externalUrl .Values.ovms.modelmesh.enabled }}
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: {{ .Values.ovms.modelName }}
+  labels:
+    {{- include "neuroface.labels" . | nindent 4 }}
+  annotations:
+    serving.kserve.io/deploymentMode: ModelMesh
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "5"
+spec:
+  predictor:
+    model:
+      modelFormat:
+        name: openvino_ir
+      runtime: {{ include "neuroface.fullname" . }}
+      storage:
+        key: {{ include "neuroface.fullname" . }}-models
+        path: {{ .Values.ovms.modelName }}
+{{- end }}
