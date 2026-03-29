@@ -260,6 +260,16 @@
       margin: 32px 0;
     }
 
+    .mermaid {
+      background: var(--rh-white);
+      border-radius: 8px;
+      padding: 20px;
+      margin: 12px 0 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border: 1px solid var(--rh-gray-200);
+      overflow-x: auto;
+    }
+
     /* ── Badges row ── */
     .badges-row {
       display: flex;
@@ -367,6 +377,7 @@
   <nav class="site-nav">
     <div class="nav-inner">
       <a href="#overview" class="active">Overview</a>
+      <a href="#architecture">Architecture</a>
       <a href="#video-demos">Demos</a>
       <a href="#screenshots">Screenshots</a>
       <a href="#helm-chart">Helm Chart</a>
@@ -383,6 +394,31 @@
       {{ content }}
     </div>
   </main>
+
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#EE0000',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#A30000',
+        secondaryColor: '#0066CC',
+        secondaryTextColor: '#fff',
+        tertiaryColor: '#F0F0F0',
+        lineColor: '#4D5258',
+        textColor: '#212427',
+        fontFamily: 'Red Hat Text, sans-serif',
+        fontSize: '13px',
+        nodeBorder: '#A30000',
+        mainBkg: '#EE0000',
+        clusterBkg: '#F0F0F0',
+        clusterBorder: '#D2D2D2',
+      },
+      flowchart: { curve: 'basis', padding: 16 },
+    });
+  </script>
 
   <footer class="site-footer">
     <div class="footer-inner">

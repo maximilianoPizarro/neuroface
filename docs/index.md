@@ -9,7 +9,7 @@
 
 ## Overview
 
-NeuroFace is a facial recognition and object detection web application built with **FastAPI** (Python) and **Angular 17**, featuring a **Red Hat design system** inspired UI. It supports:
+NeuroFace is a facial recognition and object detection web application built with **FastAPI** (Python) and **Angular 17**, containerized with Red Hat UBI9 certified images for **OpenShift**. It supports:
 
 **Face Detection Engines** (switchable at runtime):
 - **OpenCV Haar Cascades** (default) — Local CPU-based detection, no external dependencies
@@ -55,36 +55,118 @@ NeuroFace is a facial recognition and object detection web application built wit
 #### AI Face Analysis Chat
 ![Chat](screenshots/chat.png)
 
-## Architecture (v1.2.0)
+## Architecture
 
-```
-┌──────────────────────────┐       ┌──────────────────────────────────┐
-│  Frontend (Angular 17)   │       │  Backend (FastAPI on UBI9)       │
-│                          │       │                                  │
-│  WebRTC Camera ──────────┼─POST──┼─▶ /api/recognize                │
-│  Training Upload ────────┼─POST──┼─▶ /api/images, /api/train       │
-│  Object Detection ───────┼─POST──┼─▶ /api/objects/detect           │
-│  AI Chat ────────────────┼─POST──┼─▶ /api/chat                     │
-│  Model Config ───────────┼─PUT───┼─▶ /api/models/config            │
-│  Detection Switch ───────┼─PUT───┼─▶ /api/models/detection         │
-│  Flash/Torch (mobile) ───┤       │                                  │
-│  Multi-person Grid ──────┤       │                                  │
-│                          │       │                                  │
-│  Nginx (:8080)           │       │  Uvicorn (:8080)                │
-└──────────────────────────┘       │  ┌────────────────────────────┐  │
-                                   │  │ Face Detection (switchable)│  │
-                                   │  │  ├─ OpenCV Haar Cascades   │  │
-                                   │  │  └─ OpenVINO OVMS ─────────┼──┼──▶ ModelMesh
-                                   │  ├────────────────────────────┤  │    :8008
-                                   │  │ Object Detection           │  │
-                                   │  │  └─ YOLOv4-tiny (80 COCO) │  │
-                                   │  ├────────────────────────────┤  │
-                                   │  │ Recognition (pluggable)    │  │
-                                   │  │  ├─ LBPH (default)         │  │
-                                   │  │  └─ dlib (optional)        │  │
-                                   │  └────────────────────────────┘  │
-                                   └──────────────────────────────────┘
-```
+### System Overview
+
+<div class="mermaid">
+graph LR
+  subgraph Frontend["🖥️ Frontend — Angular 17 + Nginx"]
+    CAM["📷 WebRTC Camera"]
+    UI["🎨 Angular Material UI"]
+    OBJ_UI["🔍 Object Detection"]
+    CHAT_UI["💬 AI Chat"]
+  end
+
+  subgraph Backend["⚙️ Backend — FastAPI + UBI9"]
+    API["REST API<br/>Uvicorn :8080"]
+    subgraph Engines["AI Engines"]
+      CV["OpenCV<br/>Haar Cascades"]
+      OVMS_C["OpenVINO<br/>OVMS Client"]
+      YOLO["YOLOv4-tiny<br/>80 COCO Classes"]
+      LBPH["LBPH<br/>Recognizer"]
+    end
+  end
+
+  subgraph External["☁️ OpenShift AI"]
+    MM["ModelMesh<br/>:8008"]
+    FACE_M["face-detection<br/>retail-0005"]
+    LLM["LLM Endpoint<br/>Granite / LiteLLM"]
+  end
+
+  CAM -->|POST /api/recognize| API
+  CAM -->|POST /api/objects/detect| API
+  CHAT_UI -->|POST /api/chat| API
+  UI -->|PUT /api/models| API
+
+  API --> CV
+  API --> OVMS_C
+  API --> YOLO
+  API --> LBPH
+  OVMS_C -->|KServe V2| MM
+  MM --> FACE_M
+  API -->|OpenAI API| LLM
+</div>
+
+### Face Recognition Flow
+
+<div class="mermaid">
+flowchart TD
+  A["📷 Camera captures frame<br/>(base64)"] --> B["POST /api/recognize"]
+  B --> C{"Detection<br/>method?"}
+  C -- opencv --> D["OpenCV Haar Cascade<br/>detectMultiScale"]
+  C -- openvino --> E["OVMS REST call<br/>KServe V2 infer"]
+  D --> F["Face bounding boxes<br/>(x, y, w, h)"]
+  E --> F
+  F --> G{"Model<br/>trained?"}
+  G -- Yes --> H["LBPH predict<br/>on each ROI"]
+  G -- No --> I["label = unknown<br/>confidence = 0"]
+  H --> J{"confidence<br/>4-85?"}
+  J -- Yes --> K["✅ Known person<br/>label + confidence"]
+  J -- No --> I
+  I --> L["Return faces[]<br/>+ detection_method"]
+  K --> L
+  L --> M["🖥️ Draw overlay<br/>+ multi-person grid"]
+</div>
+
+### Object Detection Flow
+
+<div class="mermaid">
+flowchart TD
+  A["📷 Camera captures frame"] --> B["POST /api/objects/detect"]
+  B --> C["OpenCV DNN<br/>YOLOv4-tiny"]
+  C --> D["blobFromImage<br/>416x416, normalize"]
+  D --> E["Forward pass<br/>through network"]
+  E --> F["Parse detections<br/>80 COCO classes"]
+  F --> G["NMS filter<br/>confidence > 0.4"]
+  G --> H{"Objects<br/>found?"}
+  H -- Yes --> I["Return objects[]<br/>+ summary counts"]
+  H -- No --> J["Return empty<br/>count = 0"]
+  I --> K["🖥️ Draw bounding boxes<br/>color per class"]
+  J --> K
+</div>
+
+### Training Flow
+
+<div class="mermaid">
+flowchart TD
+  A["👤 User enters label<br/>(person name)"] --> B["📷 Capture images<br/>from camera"]
+  B --> C["POST /api/images<br/>save to /data/images/label/"]
+  C --> D["POST /api/train"]
+  D --> E{"Detection<br/>method?"}
+  E -- opencv --> F["Haar Cascade<br/>on each image"]
+  E -- openvino --> G["OVMS detect<br/>on each image"]
+  F --> H["Extract face ROIs<br/>(grayscale)"]
+  G --> H
+  H --> I["LBPH train<br/>on all ROIs + labels"]
+  I --> J["Save training.yml<br/>+ model.pickle"]
+  J --> K["✅ Model trained<br/>labels + face count"]
+</div>
+
+### AI Chat Analysis Flow
+
+<div class="mermaid">
+flowchart TD
+  A["💬 User sends message<br/>+ optional image"] --> B{"Image<br/>attached?"}
+  B -- Yes --> C["Face analysis<br/>analyze_faces()"]
+  C --> D["Object detection<br/>YOLOv4-tiny"]
+  D --> E["Build context:<br/>faces + objects + method"]
+  B -- No --> F["User message only"]
+  E --> G["Compose prompt:<br/>system + context + question"]
+  F --> G
+  G --> H["POST to LLM<br/>OpenAI-compatible API"]
+  H --> I["✅ Return response<br/>+ analysis data"]
+</div>
 
 ## Helm Chart
 
