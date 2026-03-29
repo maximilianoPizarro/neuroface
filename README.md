@@ -1,4 +1,15 @@
-# NeuroFace - Facial Recognition Webapp with ML
+<p align="center">
+  <img src="docs/icon.svg" alt="NeuroFace Logo" width="120">
+</p>
+
+<h1 align="center">NeuroFace - Facial Recognition Webapp with ML</h1>
+
+<p align="center">
+  <a href="https://artifacthub.io/packages/helm/neuroface/neuroface"><img src="https://img.shields.io/badge/Artifact%20Hub-neuroface-blue?logo=artifacthub" alt="Artifact Hub"></a>
+  <a href="https://github.com/maximilianoPizarro/neuroface/releases/tag/v1.1.0"><img src="https://img.shields.io/badge/version-v1.1.0-green" alt="Version"></a>
+  <a href="https://quay.io/repository/maximilianopizarro/neuroface-backend"><img src="https://img.shields.io/badge/quay.io-backend-red?logo=redhat" alt="Quay.io"></a>
+  <a href="https://quay.io/repository/maximilianopizarro/neuroface-frontend"><img src="https://img.shields.io/badge/quay.io-frontend-red?logo=redhat" alt="Quay.io"></a>
+</p>
 
 Facial recognition web application based on the [reconocimiento-facial](https://github.com/maximilianoPizarro/reconocimiento-facial) archetype. Built with **FastAPI** (Python) and **Angular 17**, containerized with Red Hat UBI9 certified images for **Podman Desktop** and **OpenShift**.
 
