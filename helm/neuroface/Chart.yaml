@@ -2,8 +2,8 @@ apiVersion: v2
 name: neuroface
 description: Facial Recognition Webapp with ML - FastAPI backend + Angular frontend on Red Hat UBI9 with OpenVINO Model Server
 type: application
-version: 1.1.1
-appVersion: "1.1.1"
+version: 1.2.0
+appVersion: "1.2.0"
 maintainers:
   - name: maximilianoPizarro
     url: https://github.com/maximilianoPizarro
@@ -28,9 +28,9 @@ annotations:
       url: https://github.com/maximilianoPizarro/neuroface
   artifacthub.io/images: |
     - name: backend
-      image: quay.io/maximilianopizarro/neuroface-backend:v1.1.1
+      image: quay.io/maximilianopizarro/neuroface-backend:v1.2.0
     - name: frontend
-      image: quay.io/maximilianopizarro/neuroface-frontend:v1.1.1
+      image: quay.io/maximilianopizarro/neuroface-frontend:v1.2.0
     - name: ovms
       image: openvino/model_server:2025.2.1
     - name: litellm

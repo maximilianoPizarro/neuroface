@@ -44,13 +44,27 @@ async def chat(req: ChatRequest):
     context_text = ""
 
     if req.image:
-        from app.main import face_engine
+        from app.main import face_engine, object_detector
 
         try:
             img = face_engine.decode_base64_image(req.image)
             faces = face_engine.analyze_faces(img)
             analysis = {"faces": faces, "count": len(faces)}
             context_text = _build_face_context(faces)
+
+            if object_detector and object_detector.available:
+                try:
+                    objects = object_detector.detect(img)
+                    if objects:
+                        analysis["objects"] = objects
+                        analysis["objects_count"] = len(objects)
+                        context_text += "\n\n" + _build_object_context(objects)
+                except Exception as e:
+                    logger.warning("Object detection failed in chat: %s", e)
+
+            context_text += f"\n\nDetection method: {settings.detection_method}"
+            if settings.ovms_enabled:
+                context_text += f" (OpenVINO Model Server: {settings.ovms_model_name})"
         except Exception as e:
             logger.warning("Failed to analyze image for chat: %s", e)
             context_text = "(Image analysis failed)"
@@ -111,6 +125,19 @@ async def chat(req: ChatRequest):
         raise HTTPException(status_code=502, detail="Unexpected response from LLM")
 
     return ChatResponse(response=answer, analysis=analysis)
+
+
+def _build_object_context(objects: list[dict]) -> str:
+    if not objects:
+        return ""
+    summary: dict[str, int] = {}
+    for obj in objects:
+        name = obj.get("class_name", "unknown")
+        summary[name] = summary.get(name, 0) + 1
+    lines = [f"Objects detected ({len(objects)} total):"]
+    for name, count in sorted(summary.items(), key=lambda x: -x[1]):
+        lines.append(f"  - {name}: {count}")
+    return "\n".join(lines)
 
 
 def _build_face_context(faces: list[dict]) -> str:

@@ -1,30 +1,45 @@
-# NeuroFace - Facial Recognition Webapp with ML
+# NeuroFace - Facial Recognition & Object Detection
 
 > **Experimental** — This is an experimental project for learning and demonstration purposes.
 
 ## Overview
 
-NeuroFace is a facial recognition web application built with **FastAPI** (Python) and **Angular 17**, featuring a **Red Hat design system** inspired UI. It supports two face detection engines switchable at runtime:
+NeuroFace is a facial recognition and object detection web application built with **FastAPI** (Python) and **Angular 17**, featuring a **Red Hat design system** inspired UI. It supports:
 
+**Face Detection Engines** (switchable at runtime):
 - **OpenCV Haar Cascades** (default) — Local CPU-based detection, no external dependencies
 - **OpenVINO Model Server** — Remote AI inference via OpenShift AI / ModelMesh using `face-detection-retail-0005`
 
-Recognition models (applied after detection):
-
+**Recognition Models** (applied after detection):
 - **OpenCV LBPH** (default) — Local Binary Patterns Histograms, fast and lightweight
 - **dlib** (optional) — 128-dimensional face encodings via the face_recognition library
 
-### What's New in v1.1.1
+**Object Detection:**
+- **YOLOv4-tiny** — 80 COCO classes pre-trained, via OpenCV DNN
 
-- Red Hat design system UI (Red Hat Display/Text fonts, red accent colors)
-- "Powered by OpenShift & OpenShift AI" footer
-- Experimental version badge
-- Camera flash/torch for mobile devices
-- Fullscreen mode for training
-- Documentation link in sidebar
-- Redesigned logo and favicon
+### What's New in v1.2.0
 
-## Architecture (v1.1.1)
+- **Object Detection module** — YOLOv4-tiny with 80 COCO pre-trained classes (person, car, dog, chair, bottle, laptop, cell phone, and 73 more)
+- **Multi-person face grid** — Simultaneous display for 3+ detected faces with individual face crops
+- **Enhanced AI Chat** — Now includes object detection context and OpenVINO model info when analyzing images
+- **Experimental badge** moved to footer only (removed from toolbar)
+- **New sidebar navigation** includes Object Detection link
+
+### Screenshots
+
+#### Dashboard
+![Dashboard](screenshots/dashboard.png)
+
+#### Object Detection (YOLOv4-tiny - 80 COCO Classes)
+![Object Detection](screenshots/objects.png)
+
+#### Live Face Recognition
+![Recognition](screenshots/recognition.png)
+
+#### AI Face Analysis Chat
+![Chat](screenshots/chat.png)
+
+## Architecture (v1.2.0)
 
 ```
 ┌──────────────────────────┐       ┌──────────────────────────────────┐
@@ -32,17 +47,22 @@ Recognition models (applied after detection):
 │                          │       │                                  │
 │  WebRTC Camera ──────────┼─POST──┼─▶ /api/recognize                │
 │  Training Upload ────────┼─POST──┼─▶ /api/images, /api/train       │
+│  Object Detection ───────┼─POST──┼─▶ /api/objects/detect           │
+│  AI Chat ────────────────┼─POST──┼─▶ /api/chat                     │
 │  Model Config ───────────┼─PUT───┼─▶ /api/models/config            │
 │  Detection Switch ───────┼─PUT───┼─▶ /api/models/detection         │
 │  Flash/Torch (mobile) ───┤       │                                  │
-│  Fullscreen Training ────┤       │                                  │
+│  Multi-person Grid ──────┤       │                                  │
 │                          │       │                                  │
 │  Nginx (:8080)           │       │  Uvicorn (:8080)                │
 └──────────────────────────┘       │  ┌────────────────────────────┐  │
-                                   │  │ Detection (switchable)     │  │
+                                   │  │ Face Detection (switchable)│  │
                                    │  │  ├─ OpenCV Haar Cascades   │  │
                                    │  │  └─ OpenVINO OVMS ─────────┼──┼──▶ ModelMesh
                                    │  ├────────────────────────────┤  │    :8008
+                                   │  │ Object Detection           │  │
+                                   │  │  └─ YOLOv4-tiny (80 COCO) │  │
+                                   │  ├────────────────────────────┤  │
                                    │  │ Recognition (pluggable)    │  │
                                    │  │  ├─ LBPH (default)         │  │
                                    │  │  └─ dlib (optional)        │  │
@@ -72,8 +92,8 @@ helm install neuroface neuroface/neuroface \
 | Value | Default | Description |
 |-------|---------|-------------|
 | `backend.aiModel` | `lbph` | Recognition model: `lbph` or `dlib` |
-| `backend.image.tag` | `v1.1.1` | Backend container image tag |
-| `frontend.image.tag` | `v1.1.1` | Frontend container image tag |
+| `backend.image.tag` | `v1.2.0` | Backend container image tag |
+| `frontend.image.tag` | `v1.2.0` | Frontend container image tag |
 | `ovms.enabled` | `true` | Enable OpenVINO face detection |
 | `ovms.externalUrl` | `""` | External OVMS/ModelMesh URL. When set, no standalone OVMS is deployed |
 | `ovms.modelName` | `face-detection-retail-0005` | Face detection model name on OVMS |
@@ -295,10 +315,36 @@ The dashboard shows the current system status:
 - **Model Trained** badge indicates if the LBPH recognizer is trained
 - **OpenVINO** / **OpenCV** chip shows the active detection method
 - **OVMS: connected** confirms connectivity to ModelMesh
+- **YOLO: ready** confirms the object detector is loaded
 
-### Training (with Fullscreen Mode)
+### Object Detection
 
-1. Go to **Training** and click the fullscreen icon for a distraction-free capture experience
+1. Go to **Object Detection** from the sidebar
+2. Start the camera and enable **Auto-detect** to continuously detect objects
+3. The module uses **YOLOv4-tiny** pre-trained on 80 COCO classes:
+
+   person, bicycle, car, motorbike, aeroplane, bus, train, truck, boat, traffic light, fire hydrant, stop sign, parking meter, bench, bird, cat, dog, horse, sheep, cow, elephant, bear, zebra, giraffe, backpack, umbrella, handbag, tie, suitcase, frisbee, skis, snowboard, sports ball, kite, baseball bat, baseball glove, skateboard, surfboard, tennis racket, bottle, wine glass, cup, fork, knife, spoon, bowl, banana, apple, sandwich, orange, broccoli, carrot, hot dog, pizza, donut, cake, chair, sofa, pottedplant, bed, diningtable, toilet, tvmonitor, laptop, mouse, remote, keyboard, cell phone, microwave, oven, toaster, sink, refrigerator, book, clock, vase, scissors, teddy bear, hair drier, toothbrush
+
+4. Detected objects are shown with bounding boxes and confidence scores
+5. A summary panel shows object counts grouped by class
+
+### Live Recognition (Multi-Person)
+
+1. Go to **Recognition** and start the camera
+2. Enable **Auto-detect** for continuous detection
+3. When **3+ faces** are detected, individual face crops are shown in a grid below the camera
+4. Each face card shows: cropped face image, identity label, confidence %, and dimensions
+
+### AI Face Analysis Chat
+
+1. Go to **AI Chat** — requires LLM endpoint configuration
+2. Capture an image and ask questions about faces or objects
+3. The chat now includes **object detection data** alongside face analysis data when an image is attached
+4. OpenVINO detection method info is included in the context
+
+### Training
+
+1. Go to **Training** and use the fullscreen icon for distraction-free capture
 2. On mobile, use the **flash/torch** button if you need more light
 3. Enter a person name, then capture multiple images
 4. Click **Start Training** to train the recognition model
@@ -310,13 +356,6 @@ Switch between detection methods at runtime:
 - **Face Detection Method** — switch between OpenCV (local) and OpenVINO (remote)
 - **Recognition Model** — select LBPH or dlib
 
-### Workflow
-
-1. Go to **Training** → upload images or capture from webcam
-2. Click **Start Training** — the active detection method extracts faces, then LBPH trains on the face ROIs
-3. Go to **Recognition** → enable auto-detect to see live face detection and recognition
-4. Switch detection method anytime from **Model Config**
-
 ---
 
 ## Container Images
@@ -326,17 +365,19 @@ Switch between detection methods at runtime:
 | `quay.io/maximilianopizarro/neuroface-backend` | `latest` / `v1.0.1` | Stable release without OpenVINO |
 | `quay.io/maximilianopizarro/neuroface-backend` | `v1.1.0` | With OpenVINO integration |
 | `quay.io/maximilianopizarro/neuroface-backend` | `v1.1.1` | Red Hat UI + mobile flash |
+| `quay.io/maximilianopizarro/neuroface-backend` | `v1.2.0` | Object detection + multi-person grid |
 | `quay.io/maximilianopizarro/neuroface-frontend` | `latest` / `v1.0.1` | Stable release |
 | `quay.io/maximilianopizarro/neuroface-frontend` | `v1.1.0` | With OpenVINO UI controls |
 | `quay.io/maximilianopizarro/neuroface-frontend` | `v1.1.1` | Red Hat design + fullscreen training |
+| `quay.io/maximilianopizarro/neuroface-frontend` | `v1.2.0` | Object detection + enhanced chat |
 
-## API Endpoints (v1.1.1)
+## API Endpoints (v1.2.0)
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/api/health` | GET | Liveness probe |
-| `/api/ready` | GET | Readiness probe (includes `ovms_status`, `detection_method`) |
-| `/api/recognize` | POST | Detect + recognize faces (returns `detection_method` used) |
+| `/api/ready` | GET | Readiness probe (includes `ovms_status`, `object_detection`) |
+| `/api/recognize` | POST | Detect + recognize faces |
 | `/api/train` | POST | Train model using active detection method |
 | `/api/images` | POST | Upload training image for a label |
 | `/api/images/{label}` | GET/DELETE | List or delete images for a label |
@@ -344,6 +385,11 @@ Switch between detection methods at runtime:
 | `/api/models/config` | GET/PUT | View or change AI recognition model |
 | `/api/models/detection` | PUT | Switch detection method: `opencv` or `openvino` |
 | `/api/models/available` | GET | List models and detection methods with availability |
+| `/api/objects/detect` | POST | Detect objects in image (YOLOv4-tiny, 80 COCO classes) |
+| `/api/objects/classes` | GET | List all detectable object classes |
+| `/api/objects/status` | GET | Object detector status and info |
+| `/api/chat` | POST | AI chat with face + object analysis context |
+| `/api/chat/status` | GET | Chat feature status |
 
 ## Links
 

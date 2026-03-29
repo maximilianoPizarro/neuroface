@@ -26,9 +26,8 @@ import { MatListModule } from '@angular/material/list';
       </button>
       <img src="assets/icons/icon.svg" alt="NeuroFace" class="toolbar-logo">
       <span class="app-title">NeuroFace</span>
-      <span class="experimental-badge">Experimental</span>
       <span class="spacer"></span>
-      <span class="app-subtitle">Facial Recognition ML</span>
+      <span class="app-subtitle">Facial Recognition &amp; Object Detection</span>
     </mat-toolbar>
 
     <mat-sidenav-container class="sidenav-container">
@@ -49,6 +48,10 @@ import { MatListModule } from '@angular/material/list';
           <a mat-list-item routerLink="/labels" routerLinkActive="active-link">
             <mat-icon matListItemIcon>people</mat-icon>
             <span matListItemTitle>Labels</span>
+          </a>
+          <a mat-list-item routerLink="/objects" routerLinkActive="active-link">
+            <mat-icon matListItemIcon>category</mat-icon>
+            <span matListItemTitle>Object Detection</span>
           </a>
           <a mat-list-item routerLink="/model-config" routerLinkActive="active-link">
             <mat-icon matListItemIcon>settings</mat-icon>
@@ -90,7 +93,7 @@ import { MatListModule } from '@angular/material/list';
               <a href="https://maximilianopizarro.github.io/" target="_blank" rel="noopener" class="footer-author">
                 maximilianoPizarro
               </a>
-              <span class="footer-version">v1.1.1</span>
+              <span class="footer-version">v1.2.0</span>
             </div>
           </div>
         </footer>
@@ -123,9 +126,6 @@ import { MatListModule } from '@angular/material/list';
       font-size: 13px;
       opacity: 0.7;
       font-family: 'Red Hat Text', sans-serif;
-    }
-    .experimental-badge {
-      margin-left: 12px;
     }
     .sidenav-container {
       height: calc(100vh - 67px);

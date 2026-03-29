@@ -13,7 +13,7 @@ async def liveness():
 
 @router.get("/ready")
 async def readiness():
-    from app.main import face_engine
+    from app.main import face_engine, object_detector
 
     result = {
         "status": "ok",
@@ -22,6 +22,7 @@ async def readiness():
         "detection_method": settings.detection_method,
         "chat_enabled": settings.chat_enabled,
         "ovms_enabled": settings.ovms_enabled,
+        "object_detection": object_detector.available if object_detector else False,
     }
 
     if settings.ovms_enabled and settings.ovms_rest_url:

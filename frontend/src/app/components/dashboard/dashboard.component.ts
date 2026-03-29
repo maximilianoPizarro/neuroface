@@ -36,6 +36,9 @@ import { ReadyResponse } from '../../models/interfaces';
       <mat-chip *ngIf="ready.ovms_status" [class]="ready.ovms_status === 'connected' ? 'ovms-connected' : 'ovms-error'">
         OVMS: {{ ready.ovms_status }}
       </mat-chip>
+      <mat-chip *ngIf="ready.object_detection" class="objdet-chip">
+        YOLO: ready
+      </mat-chip>
     </div>
 
     <ng-template #loadingTpl>
@@ -73,6 +76,17 @@ import { ReadyResponse } from '../../models/interfaces';
         </mat-card-header>
         <mat-card-actions>
           <a mat-raised-button routerLink="/labels">View Labels</a>
+        </mat-card-actions>
+      </mat-card>
+
+      <mat-card class="rh-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar class="rh-icon">category</mat-icon>
+          <mat-card-title>Object Detection</mat-card-title>
+          <mat-card-subtitle>Detect 80 object classes via YOLOv4-tiny</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-actions>
+          <a mat-raised-button class="rh-btn-primary" routerLink="/objects">Detect Objects</a>
         </mat-card-actions>
       </mat-card>
 
@@ -118,6 +132,7 @@ import { ReadyResponse } from '../../models/interfaces';
     .opencv-chip { background-color: #3E8635 !important; color: white !important; font-size: 11px; }
     .ovms-connected { background-color: #3E8635 !important; color: white !important; font-size: 11px; }
     .ovms-error { background-color: var(--rh-red-dark, #A30000) !important; color: white !important; font-size: 11px; }
+    .objdet-chip { background-color: #E67E22 !important; color: white !important; font-size: 11px; }
   `],
 })
 export class DashboardComponent implements OnInit {

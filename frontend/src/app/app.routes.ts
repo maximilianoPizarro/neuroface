@@ -28,6 +28,11 @@ export const routes: Routes = [
       import('./components/model-config/model-config.component').then(m => m.ModelConfigComponent),
   },
   {
+    path: 'objects',
+    loadComponent: () =>
+      import('./components/objects/objects.component').then(m => m.ObjectsComponent),
+  },
+  {
     path: 'chat',
     loadComponent: () =>
       import('./components/chat/chat.component').then(m => m.ChatComponent),

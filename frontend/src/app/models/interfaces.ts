@@ -28,6 +28,7 @@ export interface ReadyResponse {
   ovms_enabled?: boolean;
   ovms_status?: string;
   detection_method?: string;
+  object_detection?: boolean;
 }
 
 export interface ModelInfo {
@@ -117,6 +118,28 @@ export interface AnalyzedFace {
   label: string;
   confidence: number;
   features: FaceFeatures;
+}
+
+export interface DetectedObject {
+  class_id: number;
+  class_name: string;
+  confidence: number;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+export interface ObjectDetectResponse {
+  objects: DetectedObject[];
+  count: number;
+  summary: Record<string, number>;
+}
+
+export interface ObjectClassesResponse {
+  classes: string[];
+  count: number;
+  detector: Record<string, unknown> | null;
 }
 
 export interface FaceFeatures {

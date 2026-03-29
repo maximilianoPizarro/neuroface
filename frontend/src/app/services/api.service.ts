@@ -13,6 +13,8 @@ import {
   LabelsResponse,
   ChatStatusResponse,
   ChatResponse,
+  ObjectDetectResponse,
+  ObjectClassesResponse,
 } from '../models/interfaces';
 
 @Injectable({ providedIn: 'root' })
@@ -94,5 +96,19 @@ export class ApiService {
       body.image = image;
     }
     return this.http.post<ChatResponse>(`${this.baseUrl}/chat`, body);
+  }
+
+  detectObjects(imageBase64: string, confidence?: number): Observable<ObjectDetectResponse> {
+    const body: { image: string; confidence?: number } = { image: imageBase64 };
+    if (confidence !== undefined) body.confidence = confidence;
+    return this.http.post<ObjectDetectResponse>(`${this.baseUrl}/objects/detect`, body);
+  }
+
+  getObjectClasses(): Observable<ObjectClassesResponse> {
+    return this.http.get<ObjectClassesResponse>(`${this.baseUrl}/objects/classes`);
+  }
+
+  getObjectDetectorStatus(): Observable<Record<string, unknown>> {
+    return this.http.get<Record<string, unknown>>(`${this.baseUrl}/objects/status`);
   }
 }
