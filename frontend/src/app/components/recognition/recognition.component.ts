@@ -27,12 +27,12 @@ import { FaceResult } from '../../models/interfaces';
   template: `
     <h2>Live Face Recognition</h2>
 
-    <mat-card>
+    <mat-card class="rh-card">
       <mat-card-content>
         <app-camera #cam (frameCaptured)="onFrame($event)"></app-camera>
 
         <div class="controls-row">
-          <mat-slide-toggle [(ngModel)]="autoDetect" (change)="onAutoToggle()">
+          <mat-slide-toggle [(ngModel)]="autoDetect" (change)="onAutoToggle()" color="warn">
             Auto-detect
           </mat-slide-toggle>
           <mat-chip *ngIf="currentDetectionMethod" [class]="detectionChipClass">
@@ -59,6 +59,9 @@ import { FaceResult } from '../../models/interfaces';
     </mat-card>
   `,
   styles: [`
+    .rh-card {
+      border-top: 3px solid var(--rh-red, #EE0000);
+    }
     .controls-row {
       display: flex;
       align-items: center;
@@ -66,21 +69,21 @@ import { FaceResult } from '../../models/interfaces';
       margin-top: 16px;
       flex-wrap: wrap;
     }
-    .face-count { font-size: 14px; color: #666; }
-    .latency { font-size: 12px; color: #999; font-family: monospace; }
+    .face-count { font-size: 14px; color: var(--rh-gray-600, #4D5258); }
+    .latency { font-size: 12px; color: var(--rh-gray-400, #8A8D90); font-family: monospace; }
     .results { margin-top: 16px; }
     .face-item {
       display: flex;
       align-items: center;
       gap: 8px;
       padding: 8px 0;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid var(--rh-gray-200, #D2D2D2);
     }
-    .face-item mat-icon.known { color: #2e7d32; }
+    .face-item mat-icon.known { color: var(--rh-green, #3E8635); }
     .face-label { font-weight: 500; flex: 1; }
-    .face-conf { font-size: 13px; color: #888; }
-    .openvino-chip { background-color: #1976d2 !important; color: white !important; font-size: 11px; }
-    .opencv-chip { background-color: #388e3c !important; color: white !important; font-size: 11px; }
+    .face-conf { font-size: 13px; color: var(--rh-gray-400, #8A8D90); }
+    .openvino-chip { background-color: #0066CC !important; color: white !important; font-size: 11px; }
+    .opencv-chip { background-color: #3E8635 !important; color: white !important; font-size: 11px; }
   `],
 })
 export class RecognitionComponent implements OnDestroy {
@@ -158,12 +161,12 @@ export class RecognitionComponent implements OnDestroy {
 
     for (const face of this.lastResults) {
       const known = face.label !== 'unknown';
-      ctx.strokeStyle = known ? '#4caf50' : (isOpenVINO ? '#1976d2' : '#ff9800');
+      ctx.strokeStyle = known ? '#3E8635' : (isOpenVINO ? '#0066CC' : '#F4C145');
       ctx.lineWidth = 2;
       ctx.strokeRect(face.x, face.y, face.w, face.h);
 
-      ctx.fillStyle = known ? '#4caf50' : (isOpenVINO ? '#1976d2' : '#ff9800');
-      ctx.font = '14px Roboto, sans-serif';
+      ctx.fillStyle = known ? '#3E8635' : (isOpenVINO ? '#0066CC' : '#F4C145');
+      ctx.font = "14px 'Red Hat Text', Roboto, sans-serif";
       const text = `${face.label} (${face.confidence.toFixed(1)}%)`;
       const textWidth = ctx.measureText(text).width;
       ctx.fillRect(face.x, face.y - 20, textWidth + 8, 20);

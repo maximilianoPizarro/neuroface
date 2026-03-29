@@ -51,7 +51,8 @@ import { ApiService } from '../../services/api.service';
     </mat-card>
   `,
   styles: [`
-    .empty-msg { color: #999; font-style: italic; }
+    mat-card { border-top: 3px solid var(--rh-red, #EE0000); }
+    .empty-msg { color: var(--rh-gray-400, #8A8D90); font-style: italic; }
   `],
 })
 export class LabelsComponent implements OnInit {

@@ -1,8 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700&family=Red+Hat+Text:wght@400;500&display=swap');
+
+:root {
+  --rh-red: #EE0000;
+  --rh-red-dark: #A30000;
+  --rh-black: #151515;
+  --rh-gray-900: #212427;
+  --rh-gray-600: #4D5258;
+  --rh-gray-400: #8A8D90;
+  --rh-gray-200: #D2D2D2;
+  --rh-gray-100: #F0F0F0;
+  --rh-white: #FFFFFF;
+  --rh-blue: #0066CC;
+  --rh-blue-light: #73BCF7;
+  --rh-green: #3E8635;
+  --rh-orange: #F4C145;
+}
+
 html, body {
   height: 100%;
   margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
-  background-color: #fafafa;
+  font-family: 'Red Hat Text', 'Red Hat Display', Roboto, "Helvetica Neue", sans-serif;
+  background-color: var(--rh-gray-100);
+  color: var(--rh-gray-900);
+}
+
+.mat-mdc-raised-button.mat-primary,
+.mat-mdc-raised-button.mat-mdc-button-base[color="primary"],
+.mat-mdc-unelevated-button.mat-primary {
+  --mdc-filled-button-container-color: #EE0000 !important;
+  --mdc-filled-button-label-text-color: #fff !important;
+}
+
+.mat-mdc-raised-button.mat-accent,
+.mat-mdc-raised-button.mat-mdc-button-base[color="accent"],
+.mat-mdc-unelevated-button.mat-accent {
+  --mdc-filled-button-container-color: #EE0000 !important;
+  --mdc-filled-button-label-text-color: #fff !important;
+}
+
+.mat-mdc-fab.mat-primary,
+.mat-mdc-mini-fab.mat-primary {
+  --mdc-fab-container-color: #EE0000 !important;
+}
+
+.mat-toolbar.mat-primary,
+.mat-mdc-toolbar {
+  background: #151515 !important;
+  color: #fff !important;
+}
+
+.mat-mdc-slide-toggle.mat-warn .mdc-switch--selected .mdc-switch__handle::after,
+.mat-mdc-slide-toggle .mdc-switch--selected .mdc-switch__handle::after {
+  background: #EE0000 !important;
+}
+
+.mat-mdc-progress-bar .mdc-linear-progress__bar-inner {
+  border-color: #EE0000 !important;
+}
+
+a[mat-list-item].active-link {
+  background-color: rgba(238, 0, 0, 0.06) !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Red Hat Display', sans-serif;
+  font-weight: 600;
 }
 
 .container {
@@ -39,10 +101,24 @@ video, canvas {
 
 .status-badge.trained {
   background-color: #e8f5e9;
-  color: #2e7d32;
+  color: var(--rh-green);
 }
 
 .status-badge.untrained {
   background-color: #fff3e0;
   color: #e65100;
+}
+
+.experimental-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background-color: var(--rh-orange);
+  color: var(--rh-black);
 }

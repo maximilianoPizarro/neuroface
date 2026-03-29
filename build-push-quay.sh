@@ -2,14 +2,14 @@
 # Build NeuroFace images and push to quay.io
 # Usage: ./build-push-quay.sh [quay-namespace] [--dlib] [--tag TAG]
 # Default namespace: maximilianopizarro
-# Default tag: v1.1.0 (also pushes :latest)
+# Default tag: v1.1.1 (also pushes :latest)
 # Pass --dlib to include face_recognition/dlib in the backend image
 # Requires: podman, logged in to quay.io (podman login quay.io)
 
 set -e
 QUAY_NS="${1:-maximilianopizarro}"
 INSTALL_DLIB="false"
-IMAGE_TAG="v1.1.0"
+IMAGE_TAG="v1.1.1"
 
 for arg in "$@"; do
   case "$arg" in

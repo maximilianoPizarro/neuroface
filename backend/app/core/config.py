@@ -7,7 +7,7 @@ CASCADES_DIR = os.path.join(_APP_DIR, "resources", "cascades")
 
 class Settings(BaseSettings):
     app_name: str = "NeuroFace API"
-    app_version: str = "1.1.0"
+    app_version: str = "1.1.1"
     debug: bool = False
 
     ai_model: str = "lbph"

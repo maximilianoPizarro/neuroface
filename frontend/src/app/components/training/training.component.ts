@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -8,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { CameraComponent } from '../camera/camera.component';
 import { ApiService } from '../../services/api.service';
 import { CameraService } from '../../services/camera.service';
@@ -25,15 +26,25 @@ import { CameraService } from '../../services/camera.service';
     MatIconModule,
     MatSnackBarModule,
     MatProgressBarModule,
+    MatTooltipModule,
     CameraComponent,
   ],
   template: `
-    <h2>Training</h2>
+    <div class="training-header">
+      <h2>Training</h2>
+      <button mat-icon-button (click)="toggleFullscreen()" matTooltip="Fullscreen mode">
+        <mat-icon>{{ isFullscreen ? 'fullscreen_exit' : 'fullscreen' }}</mat-icon>
+      </button>
+    </div>
 
-    <div class="card-grid">
-      <mat-card>
+    <div class="card-grid" #trainingContainer>
+      <mat-card [class.fullscreen-card]="isFullscreen">
         <mat-card-header>
           <mat-card-title>Capture from Camera</mat-card-title>
+          <span class="spacer"></span>
+          <button mat-icon-button *ngIf="isFullscreen" (click)="toggleFullscreen()" matTooltip="Exit fullscreen">
+            <mat-icon>fullscreen_exit</mat-icon>
+          </button>
         </mat-card-header>
         <mat-card-content>
           <app-camera #cam (frameCaptured)="onCameraCapture($event)"></app-camera>
@@ -41,10 +52,13 @@ import { CameraService } from '../../services/camera.service';
             <mat-label>Person name (label)</mat-label>
             <input matInput [(ngModel)]="label" placeholder="e.g. john-doe">
           </mat-form-field>
+          <p *ngIf="captureCount > 0" class="upload-status">
+            {{ captureCount }} capture(s) for "{{ label }}"
+          </p>
         </mat-card-content>
       </mat-card>
 
-      <mat-card>
+      <mat-card *ngIf="!isFullscreen">
         <mat-card-header>
           <mat-card-title>Upload Images</mat-card-title>
         </mat-card-header>
@@ -62,14 +76,14 @@ import { CameraService } from '../../services/camera.service';
         </mat-card-content>
       </mat-card>
 
-      <mat-card>
+      <mat-card *ngIf="!isFullscreen">
         <mat-card-header>
           <mat-card-title>Train Model</mat-card-title>
         </mat-card-header>
         <mat-card-content>
           <p>Train the recognition model using all uploaded images.</p>
           <mat-progress-bar *ngIf="training" mode="indeterminate"></mat-progress-bar>
-          <button mat-raised-button color="primary" (click)="trainModel()" [disabled]="training">
+          <button mat-raised-button class="rh-btn-primary" (click)="trainModel()" [disabled]="training">
             <mat-icon>model_training</mat-icon>
             {{ training ? 'Training...' : 'Start Training' }}
           </button>
@@ -85,18 +99,66 @@ import { CameraService } from '../../services/camera.service';
     </div>
   `,
   styles: [`
+    .training-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
     .full-width { width: 100%; margin-top: 12px; }
-    .upload-status { margin-top: 8px; color: #2e7d32; font-size: 13px; }
+    .upload-status { margin-top: 8px; color: var(--rh-green, #3E8635); font-size: 13px; }
     .train-result { margin-top: 12px; font-size: 13px; color: #555; }
+    .rh-btn-primary {
+      background-color: var(--rh-red, #EE0000) !important;
+      color: white !important;
+    }
+    .fullscreen-card {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 9999;
+      border-radius: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      background: #000;
+    }
+    .fullscreen-card mat-card-header {
+      background: var(--rh-black, #151515);
+      color: white;
+      padding: 8px 16px;
+      flex-shrink: 0;
+    }
+    .fullscreen-card mat-card-header button {
+      color: white;
+    }
+    .fullscreen-card mat-card-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .fullscreen-card .camera-wrapper,
+    .fullscreen-card video {
+      max-width: 100%;
+      max-height: 70vh;
+    }
+    .spacer { flex: 1 1 auto; }
   `],
 })
 export class TrainingComponent {
   @ViewChild('cam') cam!: CameraComponent;
+  @ViewChild('trainingContainer') containerRef!: ElementRef;
 
   label = '';
   uploadLabel = '';
   uploadCount = 0;
+  captureCount = 0;
   training = false;
+  isFullscreen = false;
   trainResult: { labels: string[]; total_faces: number; detection_method?: string } | null = null;
 
   constructor(
@@ -104,6 +166,10 @@ export class TrainingComponent {
     private cameraService: CameraService,
     private snackBar: MatSnackBar,
   ) {}
+
+  toggleFullscreen(): void {
+    this.isFullscreen = !this.isFullscreen;
+  }
 
   onCameraCapture(base64: string): void {
     if (!this.label) {
@@ -115,6 +181,7 @@ export class TrainingComponent {
     this.api.uploadImage(this.label, file).subscribe({
       next: () => {
         this.uploadCount++;
+        this.captureCount++;
         this.snackBar.open(`Image saved for "${this.label}"`, 'OK', { duration: 2000 });
       },
       error: (err) => this.snackBar.open(`Error: ${err.message}`, 'OK', { duration: 3000 }),

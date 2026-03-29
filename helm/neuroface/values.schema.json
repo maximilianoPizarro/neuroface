@@ -23,7 +23,7 @@
               "type": "string",
               "title": "Image Tag",
               "description": "Backend container image tag",
-              "default": "v1.1.0"
+              "default": "v1.1.1"
             },
             "pullPolicy": {
               "type": "string",
@@ -119,7 +119,7 @@
               "type": "string",
               "title": "Image Tag",
               "description": "Frontend container image tag",
-              "default": "v1.1.0"
+              "default": "v1.1.1"
             },
             "pullPolicy": {
               "type": "string",

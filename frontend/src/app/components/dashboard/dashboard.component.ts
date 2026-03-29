@@ -43,31 +43,31 @@ import { ReadyResponse } from '../../models/interfaces';
     </ng-template>
 
     <div class="card-grid">
-      <mat-card>
+      <mat-card class="rh-card">
         <mat-card-header>
-          <mat-icon mat-card-avatar>face</mat-icon>
+          <mat-icon mat-card-avatar class="rh-icon">face</mat-icon>
           <mat-card-title>Live Recognition</mat-card-title>
           <mat-card-subtitle>Detect and identify faces via webcam</mat-card-subtitle>
         </mat-card-header>
         <mat-card-actions>
-          <a mat-raised-button color="primary" routerLink="/recognition">Open Camera</a>
+          <a mat-raised-button class="rh-btn-primary" routerLink="/recognition">Open Camera</a>
         </mat-card-actions>
       </mat-card>
 
-      <mat-card>
+      <mat-card class="rh-card">
         <mat-card-header>
-          <mat-icon mat-card-avatar>model_training</mat-icon>
+          <mat-icon mat-card-avatar class="rh-icon">model_training</mat-icon>
           <mat-card-title>Training</mat-card-title>
           <mat-card-subtitle>Upload images and train the model</mat-card-subtitle>
         </mat-card-header>
         <mat-card-actions>
-          <a mat-raised-button color="accent" routerLink="/training">Manage Training</a>
+          <a mat-raised-button class="rh-btn-primary" routerLink="/training">Manage Training</a>
         </mat-card-actions>
       </mat-card>
 
-      <mat-card>
+      <mat-card class="rh-card">
         <mat-card-header>
-          <mat-icon mat-card-avatar>people</mat-icon>
+          <mat-icon mat-card-avatar class="rh-icon">people</mat-icon>
           <mat-card-title>Labels</mat-card-title>
           <mat-card-subtitle>View and manage known persons</mat-card-subtitle>
         </mat-card-header>
@@ -76,9 +76,9 @@ import { ReadyResponse } from '../../models/interfaces';
         </mat-card-actions>
       </mat-card>
 
-      <mat-card>
+      <mat-card class="rh-card">
         <mat-card-header>
-          <mat-icon mat-card-avatar>settings</mat-icon>
+          <mat-icon mat-card-avatar class="rh-icon">settings</mat-icon>
           <mat-card-title>Model Configuration</mat-card-title>
           <mat-card-subtitle>Switch AI models and view settings</mat-card-subtitle>
         </mat-card-header>
@@ -94,21 +94,30 @@ import { ReadyResponse } from '../../models/interfaces';
       align-items: center;
       gap: 16px;
       margin-bottom: 16px;
+      flex-wrap: wrap;
     }
     .model-label {
       font-size: 14px;
-      color: #666;
+      color: var(--rh-gray-600, #4D5258);
     }
-    mat-card {
+    .rh-card {
+      border-top: 3px solid var(--rh-red, #EE0000);
       cursor: default;
+    }
+    .rh-icon {
+      color: var(--rh-red, #EE0000) !important;
+    }
+    .rh-btn-primary {
+      background-color: var(--rh-red, #EE0000) !important;
+      color: white !important;
     }
     mat-card-actions {
       padding: 8px 16px 16px;
     }
-    .openvino-chip { background-color: #1976d2 !important; color: white !important; font-size: 11px; }
-    .opencv-chip { background-color: #388e3c !important; color: white !important; font-size: 11px; }
-    .ovms-connected { background-color: #2e7d32 !important; color: white !important; font-size: 11px; }
-    .ovms-error { background-color: #c62828 !important; color: white !important; font-size: 11px; }
+    .openvino-chip { background-color: #0066CC !important; color: white !important; font-size: 11px; }
+    .opencv-chip { background-color: #3E8635 !important; color: white !important; font-size: 11px; }
+    .ovms-connected { background-color: #3E8635 !important; color: white !important; font-size: 11px; }
+    .ovms-error { background-color: var(--rh-red-dark, #A30000) !important; color: white !important; font-size: 11px; }
   `],
 })
 export class DashboardComponent implements OnInit {

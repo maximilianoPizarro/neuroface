@@ -148,15 +148,16 @@ import { AvailableModel, DetectionMethod, ModelConfigResponse } from '../../mode
     }
     .model-radio { margin-bottom: 8px; }
     .model-option { display: flex; flex-direction: column; }
-    .model-desc { font-size: 13px; color: #666; margin: 4px 0 0; }
+    .model-desc { font-size: 13px; color: var(--rh-gray-600, #4D5258); margin: 4px 0 0; }
     .unavailable-chip { font-size: 11px; }
     .config-section { padding: 8px 0; }
-    .config-section h4 { margin: 4px 0 8px; color: #555; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .ovms-details { margin-top: 8px; padding-left: 8px; border-left: 3px solid #1976d2; }
+    .config-section h4 { margin: 4px 0 8px; color: var(--rh-gray-600, #4D5258); font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .ovms-details { margin-top: 8px; padding-left: 8px; border-left: 3px solid var(--rh-blue, #0066CC); }
     .ovms-details p { margin: 4px 0; font-size: 13px; }
-    .openvino-chip { background-color: #1976d2 !important; color: white !important; }
-    .opencv-chip { background-color: #388e3c !important; color: white !important; }
-    .available-chip { background-color: #2e7d32 !important; color: white !important; font-size: 11px; }
+    mat-card { border-top: 3px solid var(--rh-red, #EE0000); }
+    .openvino-chip { background-color: var(--rh-blue, #0066CC) !important; color: white !important; }
+    .opencv-chip { background-color: var(--rh-green, #3E8635) !important; color: white !important; }
+    .available-chip { background-color: var(--rh-green, #3E8635) !important; color: white !important; font-size: 11px; }
   `],
 })
 export class ModelConfigComponent implements OnInit {

@@ -50,6 +50,12 @@ export class CameraService {
     await this.startCamera(video, newMode);
   }
 
+  getVideoTrack(): MediaStreamTrack | null {
+    if (!this.stream) return null;
+    const tracks = this.stream.getVideoTracks();
+    return tracks.length > 0 ? tracks[0] : null;
+  }
+
   stopCamera(video: HTMLVideoElement): void {
     if (this.stream) {
       this.stream.getTracks().forEach(track => track.stop());

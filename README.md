@@ -6,14 +6,14 @@
 
 <p align="center">
   <a href="https://artifacthub.io/packages/helm/neuroface/neuroface"><img src="https://img.shields.io/badge/Artifact%20Hub-neuroface-blue?logo=artifacthub" alt="Artifact Hub"></a>
-  <a href="https://github.com/maximilianoPizarro/neuroface/releases/tag/v1.1.0"><img src="https://img.shields.io/badge/version-v1.1.0-green" alt="Version"></a>
+  <a href="https://github.com/maximilianoPizarro/neuroface/releases/tag/v1.1.1"><img src="https://img.shields.io/badge/version-v1.1.1-green" alt="Version"></a>
   <a href="https://quay.io/repository/maximilianopizarro/neuroface-backend"><img src="https://img.shields.io/badge/quay.io-backend-red?logo=redhat" alt="Quay.io"></a>
   <a href="https://quay.io/repository/maximilianopizarro/neuroface-frontend"><img src="https://img.shields.io/badge/quay.io-frontend-red?logo=redhat" alt="Quay.io"></a>
 </p>
 
 Facial recognition web application based on the [reconocimiento-facial](https://github.com/maximilianoPizarro/reconocimiento-facial) archetype. Built with **FastAPI** (Python) and **Angular 17**, containerized with Red Hat UBI9 certified images for **Podman Desktop** and **OpenShift**.
 
-**v1.1.0** adds **OpenVINO Model Server** integration for remote AI-powered face detection via OpenShift AI / ModelMesh.
+**v1.1.1** — Red Hat design system UI, mobile flash/torch, fullscreen training, experimental badge. Built on v1.1.0 OpenVINO Model Server integration.
 
 ---
 
@@ -104,7 +104,7 @@ podman-compose up -d --build
 ### Build and Push to Quay.io
 
 ```bash
-./build-push-quay.sh [quay-namespace] [--tag v1.1.0]
+./build-push-quay.sh [quay-namespace] [--tag v1.1.1]
 ```
 
 Default namespace: `maximilianopizarro`. Requires `podman login quay.io`.
@@ -292,7 +292,7 @@ helm install neuroface neuroface/neuroface \
 
 ## AI Model Configuration
 
-### Detection Methods (v1.1.0)
+### Detection Methods (v1.1.1)
 
 | Method | Engine | Description |
 |--------|--------|-------------|
@@ -319,8 +319,8 @@ curl -X PUT /api/models/detection -d '{"detection_method": "openvino"}'
 | Value | Default | Description |
 |-------|---------|-------------|
 | `backend.aiModel` | `lbph` | Recognition model |
-| `backend.image.tag` | `v1.1.0` | Backend image tag |
-| `frontend.image.tag` | `v1.1.0` | Frontend image tag |
+| `backend.image.tag` | `v1.1.1` | Backend image tag |
+| `frontend.image.tag` | `v1.1.1` | Frontend image tag |
 | `ovms.enabled` | `true` | Enable OpenVINO detection |
 | `ovms.externalUrl` | `""` | External OVMS/ModelMesh REST URL |
 | `ovms.modelName` | `face-detection-retail-0005` | Model name on OVMS |
@@ -354,7 +354,7 @@ neuroface/
 │   │   └── services/           # API + Camera services
 │   ├── nginx.conf
 │   └── Dockerfile
-├── helm/neuroface/             # Helm chart (v1.1.0)
+├── helm/neuroface/             # Helm chart (v1.1.1)
 ├── docs/                       # GitHub Pages + Artifact Hub
 ├── .github/workflows/          # CI/CD
 ├── devfile.yaml                # Red Hat Dev Spaces
@@ -371,8 +371,10 @@ neuroface/
 |-------|-----|-------------|
 | `quay.io/maximilianopizarro/neuroface-backend` | `latest` / `v1.0.1` | Without OpenVINO |
 | `quay.io/maximilianopizarro/neuroface-backend` | `v1.1.0` | With OpenVINO integration |
+| `quay.io/maximilianopizarro/neuroface-backend` | `v1.1.1` | Red Hat UI + mobile flash |
 | `quay.io/maximilianopizarro/neuroface-frontend` | `latest` / `v1.0.1` | Without OpenVINO UI |
 | `quay.io/maximilianopizarro/neuroface-frontend` | `v1.1.0` | With OpenVINO UI controls |
+| `quay.io/maximilianopizarro/neuroface-frontend` | `v1.1.1` | Red Hat design + fullscreen training |
 
 ---
 

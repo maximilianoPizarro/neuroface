@@ -19,15 +19,15 @@ on:
         type: choice
         options: ['false', 'true']
       image_tag:
-        description: 'Image tag (e.g. v1.1.0)'
+        description: 'Image tag (e.g. v1.1.1)'
         required: false
-        default: 'v1.1.0'
+        default: 'v1.1.1'
         type: string
 
 env:
   QUAY_REGISTRY: quay.io
   QUAY_NAMESPACE: maximilianopizarro
-  IMAGE_TAG: ${{ github.event.inputs.image_tag || 'v1.1.0' }}
+  IMAGE_TAG: ${{ github.event.inputs.image_tag || 'v1.1.1' }}
 
 jobs:
   build-and-push:

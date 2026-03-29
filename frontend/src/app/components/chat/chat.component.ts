@@ -161,11 +161,14 @@ import { ChatMessage, ChatStatusResponse } from '../../models/interfaces';
       margin-bottom: 16px;
       flex-shrink: 0;
     }
+    .status-card {
+      border-top: 3px solid var(--rh-red, #EE0000);
+    }
     .status-card mat-icon[mat-card-avatar] {
       font-size: 40px;
       width: 40px;
       height: 40px;
-      color: #3f51b5;
+      color: var(--rh-red, #EE0000);
     }
     .disabled-notice {
       text-align: center;
@@ -223,7 +226,7 @@ import { ChatMessage, ChatStatusResponse } from '../../models/interfaces';
     .snapshot-preview img {
       width: 100%;
       border-radius: 4px;
-      border: 2px solid #3f51b5;
+      border: 2px solid var(--rh-red, #EE0000);
     }
     .snapshot-preview button {
       position: absolute;
@@ -280,14 +283,14 @@ import { ChatMessage, ChatStatusResponse } from '../../models/interfaces';
       line-height: 1.5;
     }
     .user .message-bubble {
-      background: #3f51b5;
+      background: var(--rh-red, #EE0000);
       color: #fff;
       border-bottom-right-radius: 4px;
     }
     .assistant .message-bubble {
       background: #fff;
       color: #333;
-      border: 1px solid #e0e0e0;
+      border: 1px solid var(--rh-gray-200, #D2D2D2);
       border-bottom-left-radius: 4px;
     }
     .message-bubble.typing {
@@ -329,7 +332,7 @@ import { ChatMessage, ChatStatusResponse } from '../../models/interfaces';
       align-items: center;
       gap: 4px;
       font-size: 12px;
-      color: #3f51b5;
+      color: var(--rh-red, #EE0000);
       white-space: nowrap;
     }
     .attached-indicator mat-icon { font-size: 16px; width: 16px; height: 16px; }

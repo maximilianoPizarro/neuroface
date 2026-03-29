@@ -15,13 +15,18 @@ import { CameraService } from '../../services/camera.service';
       <canvas #overlayCanvas class="overlay-canvas"></canvas>
     </div>
     <div class="camera-controls">
-      <button mat-raised-button color="primary" (click)="toggle()" [disabled]="starting">
+      <button mat-raised-button class="rh-btn-primary" (click)="toggle()" [disabled]="starting">
         <mat-icon>{{ active ? 'videocam_off' : 'videocam' }}</mat-icon>
         {{ active ? 'Stop' : 'Start Camera' }}
       </button>
       <button mat-icon-button (click)="flipCamera()" [disabled]="!active || !cameraService.hasMultipleCameras"
               matTooltip="Switch camera (front/rear)">
         <mat-icon>flip_camera_ios</mat-icon>
+      </button>
+      <button mat-icon-button (click)="toggleTorch()" [disabled]="!active || !torchSupported"
+              matTooltip="Toggle flashlight"
+              [class.torch-active]="torchOn">
+        <mat-icon>{{ torchOn ? 'flashlight_off' : 'flashlight_on' }}</mat-icon>
       </button>
       <button mat-raised-button (click)="capture()" [disabled]="!active">
         <mat-icon>photo_camera</mat-icon>
@@ -30,6 +35,7 @@ import { CameraService } from '../../services/camera.service';
     </div>
     <p class="camera-mode" *ngIf="active">
       {{ cameraService.facingMode === 'user' ? 'Front camera' : 'Rear camera' }}
+      <span *ngIf="torchOn" class="torch-indicator">&#x26A1; Flash ON</span>
     </p>
     <p class="error-msg" *ngIf="errorMsg">{{ errorMsg }}</p>
   `,
@@ -59,10 +65,22 @@ import { CameraService } from '../../services/camera.service';
       gap: 8px;
       margin-top: 12px;
     }
+    .rh-btn-primary {
+      background-color: var(--rh-red, #EE0000) !important;
+      color: white !important;
+    }
     .camera-mode {
       font-size: 12px;
       color: #666;
       margin-top: 4px;
+    }
+    .torch-indicator {
+      color: var(--rh-orange, #F4C145);
+      font-weight: 600;
+      margin-left: 8px;
+    }
+    .torch-active {
+      color: var(--rh-orange, #F4C145) !important;
     }
     .error-msg {
       color: #d32f2f;
@@ -79,6 +97,8 @@ export class CameraComponent implements AfterViewInit, OnDestroy {
   active = false;
   starting = false;
   errorMsg = '';
+  torchSupported = false;
+  torchOn = false;
 
   constructor(public cameraService: CameraService) {}
 
@@ -96,6 +116,8 @@ export class CameraComponent implements AfterViewInit, OnDestroy {
     if (this.active) {
       this.cameraService.stopCamera(this.videoRef.nativeElement);
       this.active = false;
+      this.torchOn = false;
+      this.torchSupported = false;
     } else {
       this.starting = true;
       this.errorMsg = '';
@@ -103,6 +125,7 @@ export class CameraComponent implements AfterViewInit, OnDestroy {
         await this.cameraService.startCamera(this.videoRef.nativeElement);
         this.active = true;
         this.syncCanvasSize();
+        this.checkTorchSupport();
       } catch {
         this.active = false;
       } finally {
@@ -114,13 +137,30 @@ export class CameraComponent implements AfterViewInit, OnDestroy {
   async flipCamera(): Promise<void> {
     if (!this.active) return;
     this.starting = true;
+    this.torchOn = false;
     try {
       await this.cameraService.switchCamera(this.videoRef.nativeElement);
       this.syncCanvasSize();
+      this.checkTorchSupport();
     } catch {
       this.errorMsg = 'Failed to switch camera';
     } finally {
       this.starting = false;
+    }
+  }
+
+  async toggleTorch(): Promise<void> {
+    if (!this.active || !this.torchSupported) return;
+    try {
+      const track = this.cameraService.getVideoTrack();
+      if (!track) return;
+      this.torchOn = !this.torchOn;
+      await track.applyConstraints({
+        advanced: [{ torch: this.torchOn } as any],
+      });
+    } catch {
+      this.errorMsg = 'Failed to toggle torch';
+      this.torchOn = false;
     }
   }
 
@@ -136,6 +176,20 @@ export class CameraComponent implements AfterViewInit, OnDestroy {
 
   get canvas(): HTMLCanvasElement {
     return this.canvasRef.nativeElement;
+  }
+
+  private checkTorchSupport(): void {
+    const track = this.cameraService.getVideoTrack();
+    if (!track) {
+      this.torchSupported = false;
+      return;
+    }
+    try {
+      const capabilities = track.getCapabilities() as any;
+      this.torchSupported = !!capabilities?.torch;
+    } catch {
+      this.torchSupported = false;
+    }
   }
 
   private syncCanvasSize(): void {
