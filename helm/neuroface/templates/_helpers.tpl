@@ -62,3 +62,36 @@ Frontend annotations (OpenShift Topology)
 app.openshift.io/connects-to: '[{"apiVersion":"apps/v1","kind":"Deployment","name":"{{ include "neuroface.fullname" . }}-backend"}]'
 app.openshift.io/runtime: angularjs
 {{- end }}
+
+{{/*
+OVMS labels
+*/}}
+{{- define "neuroface.ovmsLabels" -}}
+{{ include "neuroface.labels" . }}
+app.kubernetes.io/name: {{ include "neuroface.fullname" . }}-ovms
+app.kubernetes.io/component: ovms
+{{- end }}
+
+{{/*
+OVMS annotations (OpenShift Topology)
+*/}}
+{{- define "neuroface.ovmsAnnotations" -}}
+app.openshift.io/connects-to: '[{"apiVersion":"apps/v1","kind":"Deployment","name":"{{ include "neuroface.fullname" . }}-backend"}]'
+app.openshift.io/runtime: openvino
+{{- end }}
+
+{{/*
+LiteLLM labels
+*/}}
+{{- define "neuroface.litellmLabels" -}}
+{{ include "neuroface.labels" . }}
+app.kubernetes.io/name: {{ include "neuroface.fullname" . }}-litellm
+app.kubernetes.io/component: litellm
+{{- end }}
+
+{{/*
+LiteLLM annotations (OpenShift Topology)
+*/}}
+{{- define "neuroface.litellmAnnotations" -}}
+app.openshift.io/runtime: python
+{{- end }}

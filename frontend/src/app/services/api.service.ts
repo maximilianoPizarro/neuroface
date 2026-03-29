@@ -8,6 +8,7 @@ import {
   TrainResponse,
   ModelConfigResponse,
   AvailableModel,
+  DetectionMethod,
   LabelImages,
   LabelsResponse,
   ChatStatusResponse,
@@ -70,8 +71,17 @@ export class ApiService {
     });
   }
 
-  getAvailableModels(): Observable<{ models: AvailableModel[] }> {
-    return this.http.get<{ models: AvailableModel[] }>(`${this.baseUrl}/models/available`);
+  getAvailableModels(): Observable<{ models: AvailableModel[]; detection_methods: DetectionMethod[] }> {
+    return this.http.get<{ models: AvailableModel[]; detection_methods: DetectionMethod[] }>(
+      `${this.baseUrl}/models/available`
+    );
+  }
+
+  updateDetectionMethod(method: string): Observable<{ status: string; detection_method: string }> {
+    return this.http.put<{ status: string; detection_method: string }>(
+      `${this.baseUrl}/models/detection`,
+      { detection_method: method }
+    );
   }
 
   chatStatus(): Observable<ChatStatusResponse> {

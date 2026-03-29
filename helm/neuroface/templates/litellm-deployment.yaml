@@ -1,0 +1,53 @@
+{{- if .Values.litellm.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "neuroface.fullname" . }}-litellm
+  labels:
+    {{- include "neuroface.litellmLabels" . | nindent 4 }}
+  annotations:
+    {{- include "neuroface.litellmAnnotations" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "neuroface.fullname" . }}-litellm
+  template:
+    metadata:
+      labels:
+        {{- include "neuroface.litellmLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: litellm
+          image: "{{ .Values.litellm.image.repository }}:{{ .Values.litellm.image.tag }}"
+          imagePullPolicy: {{ .Values.litellm.image.pullPolicy | default "IfNotPresent" }}
+          args:
+            - "--config"
+            - "/app/config.yaml"
+            - "--port"
+            - {{ .Values.litellm.service.port | quote }}
+          ports:
+            - containerPort: {{ .Values.litellm.service.port }}
+              protocol: TCP
+              name: http
+          env:
+            - name: LITELLM_MASTER_KEY
+              value: {{ .Values.litellm.masterKey | quote }}
+            - name: MODEL_API_KEY
+              value: {{ .Values.litellm.model.apiKey | quote }}
+            - name: SSL_VERIFY
+              value: "False"
+            - name: LITELLM_SSL_VERIFY
+              value: "False"
+          volumeMounts:
+            - name: config
+              mountPath: /app/config.yaml
+              subPath: config.yaml
+              readOnly: true
+          resources:
+            {{- toYaml .Values.litellm.resources | nindent 12 }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "neuroface.fullname" . }}-litellm
+{{- end }}

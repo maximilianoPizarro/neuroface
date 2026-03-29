@@ -1,0 +1,26 @@
+{{- if and .Values.ovms.enabled .Values.ovms.models (not .Values.ovms.externalUrl) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "neuroface.fullname" . }}-ovms
+  labels:
+    {{- include "neuroface.ovmsLabels" . | nindent 4 }}
+data:
+  config.json: |
+    {
+      "model_config_list": [
+        {{- $last := sub (len .Values.ovms.models) 1 }}
+        {{- range $i, $model := .Values.ovms.models }}
+        {
+          "config": {
+            "name": {{ $model.name | quote }},
+            "base_path": {{ $model.path | quote }}
+            {{- if $model.layout }},
+            "layout": {{ $model.layout | quote }}
+            {{- end }}
+          }
+        }{{- if ne $i $last }},{{- end }}
+        {{- end }}
+      ]
+    }
+{{- end }}

@@ -5,11 +5,13 @@ export interface FaceResult {
   h: number;
   label: string;
   confidence: number;
+  detection_method?: string;
 }
 
 export interface RecognizeResponse {
   faces: FaceResult[];
   count: number;
+  detection_method: string;
 }
 
 export interface HealthResponse {
@@ -23,13 +25,9 @@ export interface ReadyResponse {
   model_loaded: boolean;
   ai_model: string;
   chat_enabled: boolean;
-}
-
-export interface TrainResponse {
-  status: string;
-  labels: string[];
-  total_faces: number;
-  total_labels: number;
+  ovms_enabled?: boolean;
+  ovms_status?: string;
+  detection_method?: string;
 }
 
 export interface ModelInfo {
@@ -45,13 +43,36 @@ export interface AvailableModel {
   name: string;
   available: boolean;
   description: string;
+  enabled?: boolean;
+  model_name?: string;
+  endpoint?: string;
+}
+
+export interface DetectionMethod {
+  type: string;
+  name: string;
+  available: boolean;
+  description: string;
+  enabled?: boolean;
+  model_name?: string;
+  endpoint?: string;
 }
 
 export interface ModelConfigResponse {
   ai_model: string;
+  detection_method: string;
   is_trained: boolean;
   model_info: ModelInfo;
+  ovms_info?: Record<string, unknown> | null;
   chat_enabled: boolean;
+}
+
+export interface TrainResponse {
+  status: string;
+  labels: string[];
+  total_faces: number;
+  total_labels: number;
+  detection_method?: string;
 }
 
 export interface LabelImages {

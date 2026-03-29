@@ -1,7 +1,7 @@
 backend:
   image:
     repository: quay.io/maximilianopizarro/neuroface-backend
-    tag: latest
+    tag: v1.1.0
     pullPolicy: Always
   replicas: 1
   port: 8080
@@ -18,7 +18,7 @@ backend:
 frontend:
   image:
     repository: quay.io/maximilianopizarro/neuroface-frontend
-    tag: latest
+    tag: v1.1.0
     pullPolicy: Always
   replicas: 1
   port: 8080
@@ -38,6 +38,62 @@ chat:
   autoServiceAccount: true
   maxTokens: 512
   systemPrompt: "You are a facial analysis assistant. Analyze the provided facial detection data and answer questions about expressions, characteristics, and features of the detected faces. Be concise and informative."
+
+ovms:
+  enabled: true
+  externalUrl: ""
+  image:
+    repository: openvino/model_server
+    tag: "2025.2.1"
+    pullPolicy: IfNotPresent
+  replicas: 1
+  restPort: 8000
+  grpcPort: 9000
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: "2"
+      memory: 4Gi
+  route:
+    enabled: true
+    tls:
+      termination: edge
+  modelName: "face-detection-retail-0005"
+  confidenceThreshold: "0.5"
+  defaultDetectionMethod: "opencv"
+  models: []
+  # models:
+  #   - name: face-detection
+  #     path: /models/face-detection
+  #     layout: "NCHW:NHWC"
+
+litellm:
+  enabled: false
+  image:
+    repository: litellm/litellm-non_root
+    tag: v1.82.3-stable
+    pullPolicy: IfNotPresent
+  service:
+    port: 4000
+  route:
+    enabled: true
+    tls:
+      termination: edge
+  masterKey: "sk-neuroface-1234"
+  model:
+    name: qwen3
+    modelId: isvc-qwen3-8b-fp8
+    apiBase: "https://isvc-qwen3-8b-fp8-predictor.sandbox-shared-models.svc.cluster.local:8443/v1"
+    apiKey: ""
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: "1"
+      memory: 2Gi
 
 route:
   enabled: true

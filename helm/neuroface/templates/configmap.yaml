@@ -16,3 +16,15 @@ data:
   {{- end }}
   NEUROFACE_CHAT_MAX_TOKENS: {{ .Values.chat.maxTokens | quote }}
   NEUROFACE_CHAT_SYSTEM_PROMPT: {{ .Values.chat.systemPrompt | quote }}
+  {{- if .Values.ovms.enabled }}
+  NEUROFACE_OVMS_ENABLED: "true"
+  {{- if .Values.ovms.externalUrl }}
+  NEUROFACE_OVMS_REST_URL: {{ .Values.ovms.externalUrl | quote }}
+  {{- else }}
+  NEUROFACE_OVMS_REST_URL: "http://{{ include "neuroface.fullname" . }}-ovms:{{ .Values.ovms.restPort }}"
+  NEUROFACE_OVMS_GRPC_URL: "{{ include "neuroface.fullname" . }}-ovms:{{ .Values.ovms.grpcPort }}"
+  {{- end }}
+  NEUROFACE_OVMS_MODEL_NAME: {{ .Values.ovms.modelName | default "face-detection-retail-0005" | quote }}
+  NEUROFACE_OVMS_CONFIDENCE_THRESHOLD: {{ .Values.ovms.confidenceThreshold | default "0.5" | quote }}
+  NEUROFACE_DETECTION_METHOD: {{ .Values.ovms.defaultDetectionMethod | default "opencv" | quote }}
+  {{- end }}

@@ -76,6 +76,9 @@ import { CameraService } from '../../services/camera.service';
           <div *ngIf="trainResult" class="train-result">
             <p>Labels: {{ trainResult.labels.join(', ') }}</p>
             <p>Total faces: {{ trainResult.total_faces }}</p>
+            <p *ngIf="trainResult.detection_method">
+              Detection: <strong>{{ trainResult.detection_method === 'openvino' ? 'OpenVINO (Remote)' : 'OpenCV (Local)' }}</strong>
+            </p>
           </div>
         </mat-card-content>
       </mat-card>
@@ -94,7 +97,7 @@ export class TrainingComponent {
   uploadLabel = '';
   uploadCount = 0;
   training = false;
-  trainResult: { labels: string[]; total_faces: number } | null = null;
+  trainResult: { labels: string[]; total_faces: number; detection_method?: string } | null = null;
 
   constructor(
     private api: ApiService,

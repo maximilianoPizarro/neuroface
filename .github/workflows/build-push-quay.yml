@@ -18,10 +18,16 @@ on:
         default: 'false'
         type: choice
         options: ['false', 'true']
+      image_tag:
+        description: 'Image tag (e.g. v1.1.0)'
+        required: false
+        default: 'v1.1.0'
+        type: string
 
 env:
   QUAY_REGISTRY: quay.io
   QUAY_NAMESPACE: maximilianopizarro
+  IMAGE_TAG: ${{ github.event.inputs.image_tag || 'v1.1.0' }}
 
 jobs:
   build-and-push:
@@ -66,6 +72,7 @@ jobs:
             INSTALL_DLIB=${{ github.event.inputs.install_dlib || 'false' }}
           tags: |
             ${{ env.QUAY_REGISTRY }}/${{ env.QUAY_NAMESPACE }}/neuroface-backend:latest
+            ${{ env.QUAY_REGISTRY }}/${{ env.QUAY_NAMESPACE }}/neuroface-backend:${{ env.IMAGE_TAG }}
             ${{ env.QUAY_REGISTRY }}/${{ env.QUAY_NAMESPACE }}/neuroface-backend:${{ github.sha }}
 
       - name: Build and push neuroface-frontend
@@ -76,4 +83,5 @@ jobs:
           push: true
           tags: |
             ${{ env.QUAY_REGISTRY }}/${{ env.QUAY_NAMESPACE }}/neuroface-frontend:latest
+            ${{ env.QUAY_REGISTRY }}/${{ env.QUAY_NAMESPACE }}/neuroface-frontend:${{ env.IMAGE_TAG }}
             ${{ env.QUAY_REGISTRY }}/${{ env.QUAY_NAMESPACE }}/neuroface-frontend:${{ github.sha }}

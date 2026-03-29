@@ -1,0 +1,21 @@
+{{- if and .Values.litellm.enabled .Values.litellm.route.enabled }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ include "neuroface.fullname" . }}-litellm
+  labels:
+    {{- include "neuroface.litellmLabels" . | nindent 4 }}
+  annotations:
+    haproxy.router.openshift.io/timeout: "300s"
+spec:
+  to:
+    kind: Service
+    name: {{ include "neuroface.fullname" . }}-litellm
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: {{ .Values.litellm.route.tls.termination }}
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+{{- end }}

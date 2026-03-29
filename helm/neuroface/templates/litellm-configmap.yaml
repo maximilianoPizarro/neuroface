@@ -1,0 +1,24 @@
+{{- if .Values.litellm.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "neuroface.fullname" . }}-litellm
+  labels:
+    {{- include "neuroface.litellmLabels" . | nindent 4 }}
+data:
+  config.yaml: |
+    model_list:
+      - model_name: {{ .Values.litellm.model.name }}
+        litellm_params:
+          model: openai/{{ .Values.litellm.model.modelId }}
+          api_base: {{ .Values.litellm.model.apiBase }}
+          api_key: os.environ/MODEL_API_KEY
+          ssl_verify: false
+          drop_params: true
+
+    litellm_settings:
+      drop_params: true
+
+    general_settings:
+      master_key: os.environ/LITELLM_MASTER_KEY
+{{- end }}

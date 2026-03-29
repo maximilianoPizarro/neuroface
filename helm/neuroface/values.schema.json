@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "NeuroFace Helm Chart Values",
-  "description": "Facial Recognition Webapp with ML - FastAPI backend + Angular frontend on Red Hat UBI9",
+  "description": "Facial Recognition Webapp with ML - FastAPI backend + Angular frontend on Red Hat UBI9 with OpenVINO Model Server",
   "type": "object",
   "properties": {
     "backend": {
@@ -23,7 +23,7 @@
               "type": "string",
               "title": "Image Tag",
               "description": "Backend container image tag",
-              "default": "latest"
+              "default": "v1.1.0"
             },
             "pullPolicy": {
               "type": "string",
@@ -119,7 +119,7 @@
               "type": "string",
               "title": "Image Tag",
               "description": "Frontend container image tag",
-              "default": "latest"
+              "default": "v1.1.0"
             },
             "pullPolicy": {
               "type": "string",
@@ -231,6 +231,254 @@
           "title": "System Prompt",
           "description": "System prompt for the facial analysis assistant",
           "default": "You are a facial analysis assistant. Analyze the provided facial detection data and answer questions about expressions, characteristics, and features of the detected faces. Be concise and informative."
+        }
+      }
+    },
+    "ovms": {
+      "type": "object",
+      "title": "OpenVINO Model Server",
+      "description": "Deploy OpenVINO Model Server v2025.2.1 for optimized AI inference. Accessible within the cluster without token.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "title": "Enable OVMS",
+          "description": "Enable OpenVINO Model Server for face detection",
+          "default": true
+        },
+        "externalUrl": {
+          "type": "string",
+          "title": "External OVMS URL",
+          "description": "URL of an external OVMS/ModelMesh REST endpoint (e.g. http://modelmesh-serving:8008). When set, no standalone OVMS is deployed.",
+          "default": ""
+        },
+        "image": {
+          "type": "object",
+          "title": "Container Image",
+          "properties": {
+            "repository": {
+              "type": "string",
+              "title": "Image Repository",
+              "default": "openvino/model_server"
+            },
+            "tag": {
+              "type": "string",
+              "title": "Image Tag",
+              "default": "2025.2.1"
+            },
+            "pullPolicy": {
+              "type": "string",
+              "title": "Image Pull Policy",
+              "enum": ["Always", "IfNotPresent", "Never"],
+              "default": "IfNotPresent"
+            }
+          }
+        },
+        "replicas": {
+          "type": "integer",
+          "title": "Replicas",
+          "minimum": 1,
+          "default": 1
+        },
+        "restPort": {
+          "type": "integer",
+          "title": "REST API Port",
+          "default": 8000
+        },
+        "grpcPort": {
+          "type": "integer",
+          "title": "gRPC Port",
+          "default": 9000
+        },
+        "resources": {
+          "type": "object",
+          "title": "Resources",
+          "properties": {
+            "requests": {
+              "type": "object",
+              "properties": {
+                "cpu": { "type": "string", "default": "200m" },
+                "memory": { "type": "string", "default": "512Mi" }
+              }
+            },
+            "limits": {
+              "type": "object",
+              "properties": {
+                "cpu": { "type": "string", "default": "2" },
+                "memory": { "type": "string", "default": "4Gi" }
+              }
+            }
+          }
+        },
+        "route": {
+          "type": "object",
+          "title": "OpenShift Route",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "title": "Enable Route",
+              "default": true
+            },
+            "tls": {
+              "type": "object",
+              "properties": {
+                "termination": {
+                  "type": "string",
+                  "enum": ["edge", "passthrough", "reencrypt"],
+                  "default": "edge"
+                }
+              }
+            }
+          }
+        },
+        "modelName": {
+          "type": "string",
+          "title": "Face Detection Model Name",
+          "description": "Name of the face detection model deployed on OVMS / ModelMesh",
+          "default": "face-detection-retail-0005"
+        },
+        "confidenceThreshold": {
+          "type": "string",
+          "title": "Detection Confidence Threshold",
+          "description": "Minimum confidence score (0.0-1.0) for face detections from the OpenVINO model",
+          "default": "0.5"
+        },
+        "defaultDetectionMethod": {
+          "type": "string",
+          "title": "Default Detection Method",
+          "description": "Initial face detection method: opencv (local Haar cascades) or openvino (remote OVMS)",
+          "enum": ["opencv", "openvino"],
+          "default": "opencv"
+        },
+        "models": {
+          "type": "array",
+          "title": "Model Configurations",
+          "description": "List of models to serve (used to generate config.json). Leave empty for model repository auto-discovery.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string", "title": "Model Name" },
+              "path": { "type": "string", "title": "Model Path" },
+              "layout": { "type": "string", "title": "Layout (e.g. NCHW:NHWC)" }
+            },
+            "required": ["name", "path"]
+          },
+          "default": []
+        }
+      }
+    },
+    "litellm": {
+      "type": "object",
+      "title": "LiteLLM Proxy",
+      "description": "Optional LiteLLM proxy for OpenAI-compatible API with tool calling support (Developer Sandbox pattern)",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "title": "Enable LiteLLM",
+          "description": "Deploy LiteLLM proxy for unified LLM access",
+          "default": false
+        },
+        "image": {
+          "type": "object",
+          "title": "Container Image",
+          "properties": {
+            "repository": {
+              "type": "string",
+              "default": "litellm/litellm-non_root"
+            },
+            "tag": {
+              "type": "string",
+              "default": "v1.82.3-stable"
+            },
+            "pullPolicy": {
+              "type": "string",
+              "enum": ["Always", "IfNotPresent", "Never"],
+              "default": "IfNotPresent"
+            }
+          }
+        },
+        "service": {
+          "type": "object",
+          "properties": {
+            "port": {
+              "type": "integer",
+              "default": 4000
+            }
+          }
+        },
+        "route": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true
+            },
+            "tls": {
+              "type": "object",
+              "properties": {
+                "termination": {
+                  "type": "string",
+                  "enum": ["edge", "passthrough", "reencrypt"],
+                  "default": "edge"
+                }
+              }
+            }
+          }
+        },
+        "masterKey": {
+          "type": "string",
+          "title": "Master Key",
+          "description": "Bearer token for the LiteLLM proxy API",
+          "default": "sk-neuroface-1234"
+        },
+        "model": {
+          "type": "object",
+          "title": "LLM Model Configuration",
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Model Alias",
+              "description": "Friendly name exposed via the API",
+              "default": "qwen3"
+            },
+            "modelId": {
+              "type": "string",
+              "title": "Model ID",
+              "description": "Actual model identifier at the inference endpoint",
+              "default": "isvc-qwen3-8b-fp8"
+            },
+            "apiBase": {
+              "type": "string",
+              "title": "API Base URL",
+              "description": "vLLM/RHOAI inference endpoint base URL",
+              "default": "https://isvc-qwen3-8b-fp8-predictor.sandbox-shared-models.svc.cluster.local:8443/v1"
+            },
+            "apiKey": {
+              "type": "string",
+              "title": "API Key",
+              "description": "OAuth token for the model endpoint (refresh with: oc whoami -t)",
+              "default": ""
+            }
+          }
+        },
+        "resources": {
+          "type": "object",
+          "title": "Resources",
+          "properties": {
+            "requests": {
+              "type": "object",
+              "properties": {
+                "cpu": { "type": "string", "default": "200m" },
+                "memory": { "type": "string", "default": "512Mi" }
+              }
+            },
+            "limits": {
+              "type": "object",
+              "properties": {
+                "cpu": { "type": "string", "default": "1" },
+                "memory": { "type": "string", "default": "2Gi" }
+              }
+            }
+          }
         }
       }
     },

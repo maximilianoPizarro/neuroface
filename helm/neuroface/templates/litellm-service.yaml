@@ -1,0 +1,17 @@
+{{- if .Values.litellm.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "neuroface.fullname" . }}-litellm
+  labels:
+    {{- include "neuroface.litellmLabels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.litellm.service.port }}
+      targetPort: {{ .Values.litellm.service.port }}
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: {{ include "neuroface.fullname" . }}-litellm
+{{- end }}

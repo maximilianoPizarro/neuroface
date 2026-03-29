@@ -1,0 +1,63 @@
+{{- if and .Values.ovms.enabled (not .Values.ovms.externalUrl) }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "neuroface.fullname" . }}-ovms
+  labels:
+    {{- include "neuroface.ovmsLabels" . | nindent 4 }}
+  annotations:
+    {{- include "neuroface.ovmsAnnotations" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.ovms.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "neuroface.fullname" . }}-ovms
+  template:
+    metadata:
+      labels:
+        {{- include "neuroface.ovmsLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: ovms
+          image: "{{ .Values.ovms.image.repository }}:{{ .Values.ovms.image.tag }}"
+          imagePullPolicy: {{ .Values.ovms.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.ovms.restPort }}
+              protocol: TCP
+              name: rest
+            - containerPort: {{ .Values.ovms.grpcPort }}
+              protocol: TCP
+              name: grpc
+          args:
+            - "--rest_port={{ .Values.ovms.restPort }}"
+            - "--port={{ .Values.ovms.grpcPort }}"
+            {{- if .Values.ovms.models }}
+            - "--config_path=/etc/ovms/config.json"
+            {{- end }}
+          {{- if .Values.ovms.models }}
+          volumeMounts:
+            - name: ovms-config
+              mountPath: /etc/ovms
+              readOnly: true
+          {{- end }}
+          resources:
+            {{- toYaml .Values.ovms.resources | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: /v1/config
+              port: {{ .Values.ovms.restPort }}
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /v1/config
+              port: {{ .Values.ovms.restPort }}
+            initialDelaySeconds: 15
+            periodSeconds: 30
+      {{- if .Values.ovms.models }}
+      volumes:
+        - name: ovms-config
+          configMap:
+            name: {{ include "neuroface.fullname" . }}-ovms
+      {{- end }}
+{{- end }}

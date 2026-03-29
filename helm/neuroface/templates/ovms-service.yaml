@@ -1,0 +1,21 @@
+{{- if and .Values.ovms.enabled (not .Values.ovms.externalUrl) }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "neuroface.fullname" . }}-ovms
+  labels:
+    {{- include "neuroface.ovmsLabels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.ovms.restPort }}
+      targetPort: {{ .Values.ovms.restPort }}
+      protocol: TCP
+      name: rest
+    - port: {{ .Values.ovms.grpcPort }}
+      targetPort: {{ .Values.ovms.grpcPort }}
+      protocol: TCP
+      name: grpc
+  selector:
+    app.kubernetes.io/name: {{ include "neuroface.fullname" . }}-ovms
+{{- end }}

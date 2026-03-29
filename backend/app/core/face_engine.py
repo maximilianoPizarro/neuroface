@@ -12,6 +12,7 @@ from PIL import Image
 
 from app.core.config import settings, CASCADES_DIR
 from app.models.base import FaceRecognitionModel
+from app.models.openvino_detector import OpenVINODetector
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +44,16 @@ class FaceEngine:
         self._model: Optional[FaceRecognitionModel] = None
         self._labels: dict[int, str] = {}
         self._is_trained = False
+
+        self._ovms_detector: Optional[OpenVINODetector] = None
+        if settings.ovms_enabled and settings.ovms_rest_url:
+            self._ovms_detector = OpenVINODetector(
+                rest_url=settings.ovms_rest_url,
+                model_name=settings.ovms_model_name,
+                confidence_threshold=settings.ovms_confidence_threshold,
+            )
+            logger.info("OpenVINO detector configured: %s model=%s",
+                        settings.ovms_rest_url, settings.ovms_model_name)
 
     @property
     def model(self) -> Optional[FaceRecognitionModel]:
@@ -78,33 +89,63 @@ class FaceEngine:
     def labels(self) -> dict[int, str]:
         return self._labels
 
-    def detect_faces(self, image: np.ndarray) -> list[dict]:
-        """Detect faces in an image, return list of bounding boxes."""
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    @property
+    def detection_method(self) -> str:
+        return settings.detection_method
+
+    @detection_method.setter
+    def detection_method(self, method: str):
+        settings.detection_method = method
+
+    @property
+    def ovms_detector(self) -> Optional[OpenVINODetector]:
+        return self._ovms_detector
+
+    @property
+    def ovms_available(self) -> bool:
+        return self._ovms_detector is not None and self._ovms_detector.available
+
+    def _detect_opencv(self, gray: np.ndarray) -> list[tuple[int, int, int, int]]:
         faces = self.face_cascade.detectMultiScale(
-            gray,
-            scaleFactor=1.1,
-            minNeighbors=5,
-            minSize=(30, 30),
+            gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30),
         )
+        return [(int(x), int(y), int(w), int(h)) for x, y, w, h in faces]
 
-        results = []
-        for x, y, w, h in faces:
-            face_info = {"x": int(x), "y": int(y), "w": int(w), "h": int(h)}
+    def _detect_openvino(self, image: np.ndarray) -> list[tuple[int, int, int, int]]:
+        if not self._ovms_detector:
+            raise RuntimeError("OpenVINO detector not configured")
+        detections = self._ovms_detector.detect(image)
+        return [(d["x"], d["y"], d["w"], d["h"]) for d in detections]
 
-            if self._is_trained and self._model:
-                roi_gray = gray[y : y + h, x : x + w]
-                id_, conf = self._model.predict(roi_gray)
-                if 4 <= conf <= 85:
-                    face_info["label"] = self._labels.get(id_, "unknown")
-                    face_info["confidence"] = round(float(conf), 2)
-                else:
-                    face_info["label"] = "unknown"
-                    face_info["confidence"] = round(float(conf), 2)
+    def _recognize_face(self, gray: np.ndarray, x: int, y: int, w: int, h: int) -> dict:
+        face_info: dict = {"x": x, "y": y, "w": w, "h": h}
+        if self._is_trained and self._model:
+            roi_gray = gray[y: y + h, x: x + w]
+            id_, conf = self._model.predict(roi_gray)
+            if 4 <= conf <= 85:
+                face_info["label"] = self._labels.get(id_, "unknown")
             else:
                 face_info["label"] = "unknown"
-                face_info["confidence"] = 0.0
+            face_info["confidence"] = round(float(conf), 2)
+        else:
+            face_info["label"] = "unknown"
+            face_info["confidence"] = 0.0
+        return face_info
 
+    def detect_faces(self, image: np.ndarray) -> list[dict]:
+        """Detect faces using the configured method (opencv or openvino), then recognize."""
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        method = settings.detection_method
+        if method == "openvino" and self._ovms_detector:
+            face_boxes = self._detect_openvino(image)
+        else:
+            face_boxes = self._detect_opencv(gray)
+
+        results = []
+        for x, y, w, h in face_boxes:
+            face_info = self._recognize_face(gray, x, y, w, h)
+            face_info["detection_method"] = method if method == "openvino" and self._ovms_detector else "opencv"
             results.append(face_info)
 
         return results
@@ -112,16 +153,20 @@ class FaceEngine:
     def analyze_faces(self, image: np.ndarray) -> list[dict]:
         """Full facial analysis using all available cascades."""
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        faces = self.face_cascade.detectMultiScale(
-            gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30),
-        )
+
+        method = settings.detection_method
+        if method == "openvino" and self._ovms_detector:
+            face_boxes = self._detect_openvino(image)
+        else:
+            face_boxes = self._detect_opencv(gray)
 
         results = []
-        for x, y, w, h in faces:
+        for x, y, w, h in face_boxes:
             roi_gray = gray[y : y + h, x : x + w]
             face_info: dict = {
-                "x": int(x), "y": int(y), "w": int(w), "h": int(h),
+                "x": x, "y": y, "w": w, "h": h,
                 "features": {},
+                "detection_method": method if method == "openvino" and self._ovms_detector else "opencv",
             }
 
             if self._is_trained and self._model:
@@ -183,6 +228,11 @@ class FaceEngine:
         y_labels: list[int] = []
         x_train: list[np.ndarray] = []
 
+        use_openvino = (
+            settings.detection_method == "openvino"
+            and self._ovms_detector is not None
+        )
+
         for root, _dirs, files in os.walk(settings.images_dir):
             for file in files:
                 if not file.lower().endswith((".png", ".jpg", ".jpeg")):
@@ -195,17 +245,28 @@ class FaceEngine:
                     current_id += 1
 
                 id_ = label_ids[label]
-                pil_image = Image.open(path).convert("L")
-                final_image = pil_image.resize((550, 550), Image.LANCZOS)
-                image_array = np.array(final_image, "uint8")
 
-                faces = self.face_cascade.detectMultiScale(
-                    image_array, scaleFactor=1.1, minNeighbors=5
-                )
-                for x, y, w, h in faces:
-                    roi = image_array[y : y + h, x : x + w]
-                    x_train.append(roi)
-                    y_labels.append(id_)
+                if use_openvino:
+                    color_img = cv2.imread(path)
+                    if color_img is None:
+                        continue
+                    face_boxes = self._detect_openvino(color_img)
+                    gray_img = cv2.cvtColor(color_img, cv2.COLOR_BGR2GRAY)
+                    for x, y, w, h in face_boxes:
+                        roi = gray_img[y: y + h, x: x + w]
+                        x_train.append(roi)
+                        y_labels.append(id_)
+                else:
+                    pil_image = Image.open(path).convert("L")
+                    final_image = pil_image.resize((550, 550), Image.LANCZOS)
+                    image_array = np.array(final_image, "uint8")
+                    faces = self.face_cascade.detectMultiScale(
+                        image_array, scaleFactor=1.1, minNeighbors=5
+                    )
+                    for x, y, w, h in faces:
+                        roi = image_array[y: y + h, x: x + w]
+                        x_train.append(roi)
+                        y_labels.append(id_)
 
         if not x_train:
             raise ValueError("No faces found in training images")
@@ -223,6 +284,7 @@ class FaceEngine:
             "labels": list(label_ids.keys()),
             "total_faces": len(x_train),
             "total_labels": len(label_ids),
+            "detection_method": "openvino" if use_openvino else "opencv",
         }
 
     def get_labels(self) -> list[str]:

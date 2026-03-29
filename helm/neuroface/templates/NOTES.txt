@@ -1,8 +1,14 @@
-NeuroFace has been deployed!
+NeuroFace v{{ .Chart.AppVersion }} has been deployed!
 
 Components:
   - Backend:  {{ include "neuroface.fullname" . }}-backend
   - Frontend: {{ include "neuroface.fullname" . }}-frontend
+{{- if .Values.ovms.enabled }}
+  - OpenVINO Model Server: {{ include "neuroface.fullname" . }}-ovms (v{{ .Values.ovms.image.tag }})
+{{- end }}
+{{- if .Values.litellm.enabled }}
+  - LiteLLM Proxy: {{ include "neuroface.fullname" . }}-litellm
+{{- end }}
 
 {{- if .Values.route.enabled }}
 
@@ -23,3 +29,36 @@ Then open http://localhost:{{ .Values.frontend.port }}
 
 AI Model: {{ .Values.backend.aiModel | upper }}
 Swagger UI: /api/docs
+
+{{- if .Values.ovms.enabled }}
+
+OpenVINO Model Server:
+  REST API (in-cluster, no token required):
+    http://{{ include "neuroface.fullname" . }}-ovms.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.ovms.restPort }}
+  gRPC (in-cluster):
+    {{ include "neuroface.fullname" . }}-ovms.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.ovms.grpcPort }}
+  {{- if .Values.ovms.route.enabled }}
+  External:
+    Run: oc get route {{ include "neuroface.fullname" . }}-ovms -o jsonpath='{.spec.host}'
+  {{- end }}
+  Status:
+    curl http://{{ include "neuroface.fullname" . }}-ovms:{{ .Values.ovms.restPort }}/v1/config
+{{- end }}
+
+{{- if .Values.litellm.enabled }}
+
+LiteLLM Proxy:
+  In-cluster endpoint:
+    http://{{ include "neuroface.fullname" . }}-litellm.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.litellm.service.port }}
+  Model: {{ .Values.litellm.model.name }}
+  {{- if .Values.litellm.route.enabled }}
+  External:
+    LITELLM_HOST=$(oc get route {{ include "neuroface.fullname" . }}-litellm -o jsonpath='{.spec.host}')
+    curl -s https://${LITELLM_HOST}/v1/chat/completions \
+      -H "Authorization: Bearer {{ .Values.litellm.masterKey }}" \
+      -H "Content-Type: application/json" \
+      -d '{"model":"{{ .Values.litellm.model.name }}","messages":[{"role":"user","content":"Hello"}]}'
+  {{- end }}
+  Note: OAuth token expires ~24h. Refresh with:
+    helm upgrade ... --set litellm.model.apiKey=$(oc whoami -t)
+{{- end }}

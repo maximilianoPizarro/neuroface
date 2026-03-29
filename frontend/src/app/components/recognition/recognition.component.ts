@@ -4,6 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatChipsModule } from '@angular/material/chips';
 import { FormsModule } from '@angular/forms';
 import { CameraComponent } from '../camera/camera.component';
 import { ApiService } from '../../services/api.service';
@@ -19,6 +20,7 @@ import { FaceResult } from '../../models/interfaces';
     MatButtonModule,
     MatIconModule,
     MatSlideToggleModule,
+    MatChipsModule,
     FormsModule,
     CameraComponent,
   ],
@@ -33,8 +35,14 @@ import { FaceResult } from '../../models/interfaces';
           <mat-slide-toggle [(ngModel)]="autoDetect" (change)="onAutoToggle()">
             Auto-detect
           </mat-slide-toggle>
+          <mat-chip *ngIf="currentDetectionMethod" [class]="detectionChipClass">
+            {{ currentDetectionMethod === 'openvino' ? 'OpenVINO' : 'OpenCV' }}
+          </mat-chip>
           <span class="face-count" *ngIf="lastResults.length > 0">
             Faces detected: <strong>{{ lastResults.length }}</strong>
+          </span>
+          <span class="latency" *ngIf="latencyMs > 0">
+            {{ latencyMs }}ms
           </span>
         </div>
 
@@ -54,10 +62,12 @@ import { FaceResult } from '../../models/interfaces';
     .controls-row {
       display: flex;
       align-items: center;
-      gap: 24px;
+      gap: 16px;
       margin-top: 16px;
+      flex-wrap: wrap;
     }
     .face-count { font-size: 14px; color: #666; }
+    .latency { font-size: 12px; color: #999; font-family: monospace; }
     .results { margin-top: 16px; }
     .face-item {
       display: flex;
@@ -69,6 +79,8 @@ import { FaceResult } from '../../models/interfaces';
     .face-item mat-icon.known { color: #2e7d32; }
     .face-label { font-weight: 500; flex: 1; }
     .face-conf { font-size: 13px; color: #888; }
+    .openvino-chip { background-color: #1976d2 !important; color: white !important; font-size: 11px; }
+    .opencv-chip { background-color: #388e3c !important; color: white !important; font-size: 11px; }
   `],
 })
 export class RecognitionComponent implements OnDestroy {
@@ -76,6 +88,8 @@ export class RecognitionComponent implements OnDestroy {
 
   autoDetect = false;
   lastResults: FaceResult[] = [];
+  currentDetectionMethod = '';
+  latencyMs = 0;
   private intervalId: ReturnType<typeof setInterval> | null = null;
 
   constructor(
@@ -85,6 +99,10 @@ export class RecognitionComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.stopAutoDetect();
+  }
+
+  get detectionChipClass(): string {
+    return this.currentDetectionMethod === 'openvino' ? 'openvino-chip' : 'opencv-chip';
   }
 
   onFrame(base64: string): void {
@@ -117,9 +135,12 @@ export class RecognitionComponent implements OnDestroy {
   }
 
   private recognize(base64: string): void {
+    const start = performance.now();
     this.api.recognize(base64).subscribe({
       next: (res) => {
+        this.latencyMs = Math.round(performance.now() - start);
         this.lastResults = res.faces;
+        this.currentDetectionMethod = res.detection_method;
         this.drawOverlay();
       },
     });
@@ -133,12 +154,15 @@ export class RecognitionComponent implements OnDestroy {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    const isOpenVINO = this.currentDetectionMethod === 'openvino';
+
     for (const face of this.lastResults) {
-      ctx.strokeStyle = face.label !== 'unknown' ? '#4caf50' : '#ff9800';
+      const known = face.label !== 'unknown';
+      ctx.strokeStyle = known ? '#4caf50' : (isOpenVINO ? '#1976d2' : '#ff9800');
       ctx.lineWidth = 2;
       ctx.strokeRect(face.x, face.y, face.w, face.h);
 
-      ctx.fillStyle = face.label !== 'unknown' ? '#4caf50' : '#ff9800';
+      ctx.fillStyle = known ? '#4caf50' : (isOpenVINO ? '#1976d2' : '#ff9800');
       ctx.font = '14px Roboto, sans-serif';
       const text = `${face.label} (${face.confidence.toFixed(1)}%)`;
       const textWidth = ctx.measureText(text).width;

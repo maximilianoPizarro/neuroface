@@ -5,6 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatChipsModule } from '@angular/material/chips';
 import { ApiService } from '../../services/api.service';
 import { ReadyResponse } from '../../models/interfaces';
 
@@ -18,6 +19,7 @@ import { ReadyResponse } from '../../models/interfaces';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    MatChipsModule,
   ],
   template: `
     <h2>Dashboard</h2>
@@ -28,6 +30,12 @@ import { ReadyResponse } from '../../models/interfaces';
         {{ ready.model_loaded ? 'Model Trained' : 'Model Not Trained' }}
       </span>
       <span class="model-label">AI Model: <strong>{{ ready.ai_model | uppercase }}</strong></span>
+      <mat-chip *ngIf="ready.detection_method" [class]="ready.detection_method === 'openvino' ? 'openvino-chip' : 'opencv-chip'">
+        {{ ready.detection_method === 'openvino' ? 'OpenVINO' : 'OpenCV' }}
+      </mat-chip>
+      <mat-chip *ngIf="ready.ovms_status" [class]="ready.ovms_status === 'connected' ? 'ovms-connected' : 'ovms-error'">
+        OVMS: {{ ready.ovms_status }}
+      </mat-chip>
     </div>
 
     <ng-template #loadingTpl>
@@ -97,6 +105,10 @@ import { ReadyResponse } from '../../models/interfaces';
     mat-card-actions {
       padding: 8px 16px 16px;
     }
+    .openvino-chip { background-color: #1976d2 !important; color: white !important; font-size: 11px; }
+    .opencv-chip { background-color: #388e3c !important; color: white !important; font-size: 11px; }
+    .ovms-connected { background-color: #2e7d32 !important; color: white !important; font-size: 11px; }
+    .ovms-error { background-color: #c62828 !important; color: white !important; font-size: 11px; }
   `],
 })
 export class DashboardComponent implements OnInit {

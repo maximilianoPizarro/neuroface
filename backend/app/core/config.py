@@ -7,7 +7,7 @@ CASCADES_DIR = os.path.join(_APP_DIR, "resources", "cascades")
 
 class Settings(BaseSettings):
     app_name: str = "NeuroFace API"
-    app_version: str = "1.0.1"
+    app_version: str = "1.1.0"
     debug: bool = False
 
     ai_model: str = "lbph"
@@ -37,6 +37,13 @@ class Settings(BaseSettings):
         "data and answer questions about expressions, characteristics, and features "
         "of the detected faces. Be concise and informative."
     )
+
+    ovms_enabled: bool = False
+    ovms_rest_url: str = ""
+    ovms_grpc_url: str = ""
+    ovms_model_name: str = "face-detection-retail-0005"
+    ovms_confidence_threshold: float = 0.5
+    detection_method: str = "opencv"
 
     class Config:
         env_prefix = "NEUROFACE_"
