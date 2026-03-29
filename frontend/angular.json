@@ -19,7 +19,8 @@
             "tsConfig": "tsconfig.app.json",
             "assets": [
               { "glob": "**/*", "input": "src/assets", "output": "/assets" },
-              "src/manifest.webmanifest"
+              "src/manifest.webmanifest",
+              { "glob": "favicon.svg", "input": "src/assets", "output": "/" }
             ],
             "styles": [
               "@angular/material/prebuilt-themes/indigo-pink.css",

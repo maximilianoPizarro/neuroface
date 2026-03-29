@@ -60,13 +60,11 @@ import { MatListModule } from '@angular/material/list';
           </a>
         </mat-nav-list>
 
-        <div class="sidenav-footer">
-          <div class="author-link">
-            <mat-icon>person</mat-icon>
-            <a href="https://maximilianopizarro.github.io/" target="_blank" rel="noopener">
-              maximilianoPizarro
-            </a>
-          </div>
+        <div class="sidenav-bottom">
+          <a href="https://maximilianopizarro.github.io/neuroface/" target="_blank" rel="noopener" class="docs-link">
+            <mat-icon>menu_book</mat-icon>
+            <span>Documentation</span>
+          </a>
         </div>
       </mat-sidenav>
 
@@ -79,13 +77,19 @@ import { MatListModule } from '@angular/material/list';
           <div class="footer-content">
             <div class="footer-powered">
               <span>Powered by</span>
-              <img src="https://www.redhat.com/misc/favicon.ico" alt="Red Hat" class="footer-icon">
+              <svg class="footer-rh-icon" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                <rect width="32" height="32" rx="4" fill="#EE0000"/>
+                <text x="16" y="22" text-anchor="middle" fill="#fff" font-size="18" font-weight="bold" font-family="sans-serif">RH</text>
+              </svg>
               <strong>OpenShift</strong>
-              <span>&</span>
+              <span>&amp;</span>
               <strong>OpenShift AI</strong>
             </div>
             <div class="footer-meta">
               <span class="experimental-badge">Experimental</span>
+              <a href="https://maximilianopizarro.github.io/" target="_blank" rel="noopener" class="footer-author">
+                maximilianoPizarro
+              </a>
               <span class="footer-version">v1.1.1</span>
             </div>
           </div>
@@ -98,15 +102,15 @@ import { MatListModule } from '@angular/material/list';
       position: sticky;
       top: 0;
       z-index: 1000;
-      background: var(--rh-black);
-      color: var(--rh-white);
+      background: var(--rh-black) !important;
+      color: var(--rh-white) !important;
       border-bottom: 3px solid var(--rh-red);
     }
     .toolbar-logo {
-      height: 28px;
-      width: 28px;
+      height: 30px;
+      width: 30px;
       margin-left: 8px;
-      filter: brightness(0) invert(1);
+      border-radius: 6px;
     }
     .app-title {
       font-family: 'Red Hat Display', sans-serif;
@@ -140,29 +144,27 @@ import { MatListModule } from '@angular/material/list';
       background-color: rgba(238, 0, 0, 0.06) !important;
       border-left: 3px solid var(--rh-red);
     }
-    .sidenav-footer {
+    .sidenav-bottom {
       padding: 12px 16px;
       border-top: 1px solid var(--rh-gray-200);
-      font-size: 12px;
     }
-    .author-link {
+    .docs-link {
       display: flex;
       align-items: center;
-      gap: 6px;
-      color: var(--rh-gray-600);
-    }
-    .author-link mat-icon {
-      font-size: 16px;
-      width: 16px;
-      height: 16px;
-    }
-    .author-link a {
+      gap: 8px;
       color: var(--rh-blue);
       text-decoration: none;
+      font-size: 13px;
       font-weight: 500;
-      font-size: 12px;
+      padding: 4px 0;
     }
-    .author-link a:hover {
+    .docs-link mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      color: var(--rh-gray-600);
+    }
+    .docs-link:hover {
       text-decoration: underline;
     }
     .main-content {
@@ -177,7 +179,7 @@ import { MatListModule } from '@angular/material/list';
     .app-footer {
       background: var(--rh-gray-900);
       color: var(--rh-gray-200);
-      padding: 16px 24px;
+      padding: 14px 24px;
       margin-top: auto;
     }
     .footer-content {
@@ -198,14 +200,24 @@ import { MatListModule } from '@angular/material/list';
     .footer-powered strong {
       color: var(--rh-white);
     }
-    .footer-icon {
-      height: 16px;
-      width: 16px;
+    .footer-rh-icon {
+      height: 18px;
+      width: 18px;
     }
     .footer-meta {
       display: flex;
       align-items: center;
       gap: 12px;
+    }
+    .footer-author {
+      color: var(--rh-blue-light);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .footer-author:hover {
+      text-decoration: underline;
+      color: var(--rh-white);
     }
     .footer-version {
       font-size: 12px;

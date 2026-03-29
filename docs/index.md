@@ -1,8 +1,10 @@
 # NeuroFace - Facial Recognition Webapp with ML
 
+> **Experimental** — This is an experimental project for learning and demonstration purposes.
+
 ## Overview
 
-NeuroFace is a facial recognition web application built with **FastAPI** (Python) and **Angular 17**. It supports two face detection engines that can be switched at runtime:
+NeuroFace is a facial recognition web application built with **FastAPI** (Python) and **Angular 17**, featuring a **Red Hat design system** inspired UI. It supports two face detection engines switchable at runtime:
 
 - **OpenCV Haar Cascades** (default) — Local CPU-based detection, no external dependencies
 - **OpenVINO Model Server** — Remote AI inference via OpenShift AI / ModelMesh using `face-detection-retail-0005`
@@ -12,7 +14,17 @@ Recognition models (applied after detection):
 - **OpenCV LBPH** (default) — Local Binary Patterns Histograms, fast and lightweight
 - **dlib** (optional) — 128-dimensional face encodings via the face_recognition library
 
-## Architecture (v1.1.0)
+### What's New in v1.1.1
+
+- Red Hat design system UI (Red Hat Display/Text fonts, red accent colors)
+- "Powered by OpenShift & OpenShift AI" footer
+- Experimental version badge
+- Camera flash/torch for mobile devices
+- Fullscreen mode for training
+- Documentation link in sidebar
+- Redesigned logo and favicon
+
+## Architecture (v1.1.1)
 
 ```
 ┌──────────────────────────┐       ┌──────────────────────────────────┐
@@ -22,6 +34,8 @@ Recognition models (applied after detection):
 │  Training Upload ────────┼─POST──┼─▶ /api/images, /api/train       │
 │  Model Config ───────────┼─PUT───┼─▶ /api/models/config            │
 │  Detection Switch ───────┼─PUT───┼─▶ /api/models/detection         │
+│  Flash/Torch (mobile) ───┤       │                                  │
+│  Fullscreen Training ────┤       │                                  │
 │                          │       │                                  │
 │  Nginx (:8080)           │       │  Uvicorn (:8080)                │
 └──────────────────────────┘       │  ┌────────────────────────────┐  │
@@ -58,6 +72,8 @@ helm install neuroface neuroface/neuroface \
 | Value | Default | Description |
 |-------|---------|-------------|
 | `backend.aiModel` | `lbph` | Recognition model: `lbph` or `dlib` |
+| `backend.image.tag` | `v1.1.1` | Backend container image tag |
+| `frontend.image.tag` | `v1.1.1` | Frontend container image tag |
 | `ovms.enabled` | `true` | Enable OpenVINO face detection |
 | `ovms.externalUrl` | `""` | External OVMS/ModelMesh URL. When set, no standalone OVMS is deployed |
 | `ovms.modelName` | `face-detection-retail-0005` | Face detection model name on OVMS |
@@ -68,7 +84,7 @@ helm install neuroface neuroface/neuroface \
 
 ## Deploying OpenVINO on Red Hat Developer Sandbox
 
-This guide explains how to deploy the `face-detection-retail-0005` model on **OpenShift AI (RHOAI)** in a **Red Hat Developer Sandbox** so that NeuroFace can use it for face detection.
+This guide explains how to deploy the `face-detection-retail-0005` model on **OpenShift AI (RHOAI)** in a **Red Hat Developer Sandbox** so that NeuroFace can use it for remote face detection.
 
 ### Prerequisites
 
@@ -260,6 +276,7 @@ Expected output:
 ### Step 7: Deploy NeuroFace
 
 ```bash
+helm repo add neuroface https://maximilianopizarro.github.io/neuroface/
 helm install neuroface neuroface/neuroface \
   --set ovms.externalUrl=http://modelmesh-serving:8008 \
   --set ovms.modelName=face-detection-retail-0005
@@ -273,30 +290,32 @@ The backend auto-detects the model's input/output tensor names from the OVMS met
 
 ### Dashboard
 
-The dashboard shows the current status:
-
-![Dashboard v1.1.0](dashboard-v110.png)
+The dashboard shows the current system status:
 
 - **Model Trained** badge indicates if the LBPH recognizer is trained
 - **OpenVINO** / **OpenCV** chip shows the active detection method
 - **OVMS: connected** confirms connectivity to ModelMesh
 
+### Training (with Fullscreen Mode)
+
+1. Go to **Training** and click the fullscreen icon for a distraction-free capture experience
+2. On mobile, use the **flash/torch** button if you need more light
+3. Enter a person name, then capture multiple images
+4. Click **Start Training** to train the recognition model
+
 ### Model Configuration
 
 Switch between detection methods at runtime:
 
-![Model Config v1.1.0](model-config-v110.png)
-
-- **Current Configuration** shows recognition model + detection method details
-- **Face Detection Method** radio buttons to switch between OpenCV (local) and OpenVINO (remote)
-- **Recognition Model** selector for LBPH or dlib
+- **Face Detection Method** — switch between OpenCV (local) and OpenVINO (remote)
+- **Recognition Model** — select LBPH or dlib
 
 ### Workflow
 
 1. Go to **Training** → upload images or capture from webcam
-2. Click **Start Training** — the active detection method (OpenCV or OpenVINO) extracts faces from images, then LBPH trains on the face ROIs
+2. Click **Start Training** — the active detection method extracts faces, then LBPH trains on the face ROIs
 3. Go to **Recognition** → enable auto-detect to see live face detection and recognition
-4. Switch detection method anytime from **Model Config** — no re-training needed for detection, but you can re-train if you want to compare results
+4. Switch detection method anytime from **Model Config**
 
 ---
 
@@ -306,10 +325,12 @@ Switch between detection methods at runtime:
 |-------|-----|-------------|
 | `quay.io/maximilianopizarro/neuroface-backend` | `latest` / `v1.0.1` | Stable release without OpenVINO |
 | `quay.io/maximilianopizarro/neuroface-backend` | `v1.1.0` | With OpenVINO integration |
+| `quay.io/maximilianopizarro/neuroface-backend` | `v1.1.1` | Red Hat UI + mobile flash |
 | `quay.io/maximilianopizarro/neuroface-frontend` | `latest` / `v1.0.1` | Stable release |
 | `quay.io/maximilianopizarro/neuroface-frontend` | `v1.1.0` | With OpenVINO UI controls |
+| `quay.io/maximilianopizarro/neuroface-frontend` | `v1.1.1` | Red Hat design + fullscreen training |
 
-## API Endpoints (v1.1.0)
+## API Endpoints (v1.1.1)
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
@@ -317,7 +338,10 @@ Switch between detection methods at runtime:
 | `/api/ready` | GET | Readiness probe (includes `ovms_status`, `detection_method`) |
 | `/api/recognize` | POST | Detect + recognize faces (returns `detection_method` used) |
 | `/api/train` | POST | Train model using active detection method |
-| `/api/models/config` | GET/PUT | View or change recognition model |
+| `/api/images` | POST | Upload training image for a label |
+| `/api/images/{label}` | GET/DELETE | List or delete images for a label |
+| `/api/labels` | GET | List known persons/labels |
+| `/api/models/config` | GET/PUT | View or change AI recognition model |
 | `/api/models/detection` | PUT | Switch detection method: `opencv` or `openvino` |
 | `/api/models/available` | GET | List models and detection methods with availability |
 
@@ -325,4 +349,5 @@ Switch between detection methods at runtime:
 
 - **Source:** [github.com/maximilianoPizarro/neuroface](https://github.com/maximilianoPizarro/neuroface)
 - **Helm Chart:** [Artifact Hub](https://artifacthub.io/packages/helm/neuroface/neuroface)
+- **Author:** [maximilianoPizarro](https://maximilianopizarro.github.io/)
 - **Based on:** [reconocimiento-facial](https://github.com/maximilianoPizarro/reconocimiento-facial)
