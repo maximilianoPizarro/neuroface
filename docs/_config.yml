@@ -1,10 +1,12 @@
 title: NeuroFace
 description: Facial Recognition & Object Detection — Powered by OpenShift & OpenShift AI
 
-exclude:
+include:
   - "*.tgz"
   - index.yaml
   - artifacthub-repo.yml
+
+exclude:
   - favicon_2.ico
   - favicon_3.ico
   - favicon_4.ico
