@@ -1,4 +1,9 @@
-# NeuroFace - Facial Recognition & Object Detection
+[![Artifact Hub](https://img.shields.io/badge/Artifact%20Hub-neuroface-blue?logo=artifacthub)](https://artifacthub.io/packages/helm/neuroface/neuroface)
+[![Version](https://img.shields.io/badge/version-v1.2.0-green)](https://github.com/maximilianoPizarro/neuroface/releases/tag/v1.2.0)
+[![Quay.io Backend](https://img.shields.io/badge/quay.io-backend-red?logo=redhat)](https://quay.io/repository/maximilianopizarro/neuroface-backend)
+[![Quay.io Frontend](https://img.shields.io/badge/quay.io-frontend-red?logo=redhat)](https://quay.io/repository/maximilianopizarro/neuroface-frontend)
+[![OpenShift](https://img.shields.io/badge/OpenShift-Ready-EE0000?logo=redhatopenshift)](https://developers.redhat.com/developer-sandbox)
+[![License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/maximilianoPizarro/neuroface/blob/main/LICENSE)
 
 > **Experimental** — This is an experimental project for learning and demonstration purposes.
 

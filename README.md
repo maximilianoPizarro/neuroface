@@ -9,6 +9,8 @@
   <a href="https://github.com/maximilianoPizarro/neuroface/releases/tag/v1.2.0"><img src="https://img.shields.io/badge/version-v1.2.0-green" alt="Version"></a>
   <a href="https://quay.io/repository/maximilianopizarro/neuroface-backend"><img src="https://img.shields.io/badge/quay.io-backend-red?logo=redhat" alt="Quay.io"></a>
   <a href="https://quay.io/repository/maximilianopizarro/neuroface-frontend"><img src="https://img.shields.io/badge/quay.io-frontend-red?logo=redhat" alt="Quay.io"></a>
+  <a href="https://developers.redhat.com/developer-sandbox"><img src="https://img.shields.io/badge/OpenShift-Ready-EE0000?logo=redhatopenshift" alt="OpenShift"></a>
+  <a href="https://maximilianopizarro.github.io/neuroface/"><img src="https://img.shields.io/badge/docs-GitHub%20Pages-blue?logo=github" alt="Documentation"></a>
 </p>
 
 Facial recognition and object detection web application based on the [reconocimiento-facial](https://github.com/maximilianoPizarro/reconocimiento-facial) archetype. Built with **FastAPI** (Python) and **Angular 17**, containerized with Red Hat UBI9 certified images for **Podman Desktop** and **OpenShift**.
