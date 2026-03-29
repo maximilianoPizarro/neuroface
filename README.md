@@ -17,11 +17,10 @@ Facial recognition and object detection web application based on the [reconocimi
 
 **v1.2.0** — Object detection (YOLOv4-tiny, 80 COCO classes), multi-person face grid, enhanced AI chat with object context.
 
-### Video Demos
+### Video Demo
 
 <p align="center">
   <a href="https://youtu.be/lvFu5u7slXg"><img src="https://img.youtube.com/vi/lvFu5u7slXg/maxresdefault.jpg" alt="NeuroFace Demo" width="480"></a>
-  <a href="https://www.youtube.com/shorts/E52h4-aS5Rg"><img src="https://img.youtube.com/vi/E52h4-aS5Rg/maxresdefault.jpg" alt="NeuroFace Mobile Demo" width="160"></a>
 </p>
 
 ---

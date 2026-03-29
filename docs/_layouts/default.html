@@ -23,7 +23,7 @@
       --rh-blue-light: #73BCF7;
       --rh-green: #3E8635;
       --rh-orange: #F4C145;
-      --content-max: 960px;
+      --content-max: 1200px;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -87,7 +87,10 @@
       display: flex;
       gap: 0;
       overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
     }
+    .nav-inner::-webkit-scrollbar { display: none; }
     .nav-inner a {
       color: var(--rh-gray-200);
       text-decoration: none;
