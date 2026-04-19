@@ -21,13 +21,13 @@ on:
       image_tag:
         description: 'Image tag (e.g. v1.2.0)'
         required: false
-        default: 'v1.2.0'
+        default: 'v1.3.0'
         type: string
 
 env:
   QUAY_REGISTRY: quay.io
   QUAY_NAMESPACE: maximilianopizarro
-  IMAGE_TAG: ${{ github.event.inputs.image_tag || 'v1.2.0' }}
+  IMAGE_TAG: ${{ github.event.inputs.image_tag || 'v1.3.0' }}
 
 jobs:
   build-and-push:
@@ -85,3 +85,30 @@ jobs:
             ${{ env.QUAY_REGISTRY }}/${{ env.QUAY_NAMESPACE }}/neuroface-frontend:latest
             ${{ env.QUAY_REGISTRY }}/${{ env.QUAY_NAMESPACE }}/neuroface-frontend:${{ env.IMAGE_TAG }}
             ${{ env.QUAY_REGISTRY }}/${{ env.QUAY_NAMESPACE }}/neuroface-frontend:${{ github.sha }}
+
+  publish-helm-chart:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+
+      - name: Package and index Helm chart
+        run: |
+          helm package helm/neuroface -d docs/
+          helm repo index docs --url https://maximilianopizarro.github.io/neuroface/ --merge docs/index.yaml
+
+      - name: Commit and push Helm chart
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/
+          git diff --staged --quiet || git commit -m "Release Helm chart $(grep '^version:' helm/neuroface/Chart.yaml | awk '{print $2}')"
+          git push
