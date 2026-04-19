@@ -96,7 +96,7 @@ const PPE_COLORS: Record<string, string> = {
             </mat-card-title>
           </mat-card-header>
           <mat-card-content>
-            <p class="llm-text">{{ lastResult.llm_analysis }}</p>
+            <p class="llm-text">{{ lastResult?.llm_analysis }}</p>
           </mat-card-content>
         </mat-card>
       </div>
