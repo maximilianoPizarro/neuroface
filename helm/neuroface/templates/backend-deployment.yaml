@@ -29,13 +29,20 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ include "neuroface.fullname" . }}-config
-          {{- if and .Values.chat.enabled .Values.chat.autoServiceAccount }}
           env:
+          {{- if and .Values.chat.enabled .Values.chat.autoServiceAccount }}
             - name: NEUROFACE_CHAT_API_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{ include "neuroface.fullname" . }}-chat-token
                   key: token
+          {{- end }}
+          {{- if and .Values.ppe.enabled .Values.ppe.kafka.enabled }}
+            - name: NEUROFACE_PPE_KAFKA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.ppe.kafka.secretName }}
+                  key: password
           {{- end }}
           resources:
             {{- toYaml .Values.backend.resources | nindent 12 }}
@@ -51,14 +58,28 @@ spec:
               port: {{ .Values.backend.port }}
             initialDelaySeconds: 5
             periodSeconds: 10
-          {{- if .Values.persistence.enabled }}
+          {{- if or .Values.persistence.enabled (and .Values.ppe.enabled .Values.ppe.kafka.enabled) }}
           volumeMounts:
+          {{- if .Values.persistence.enabled }}
             - name: data
               mountPath: /data
           {{- end }}
-      {{- if .Values.persistence.enabled }}
+          {{- if and .Values.ppe.enabled .Values.ppe.kafka.enabled }}
+            - name: kafka-ca-cert
+              mountPath: /etc/kafka-certs
+              readOnly: true
+          {{- end }}
+          {{- end }}
+      {{- if or .Values.persistence.enabled (and .Values.ppe.enabled .Values.ppe.kafka.enabled) }}
       volumes:
+      {{- if .Values.persistence.enabled }}
         - name: data
           persistentVolumeClaim:
             claimName: {{ include "neuroface.fullname" . }}-data
+      {{- end }}
+      {{- if and .Values.ppe.enabled .Values.ppe.kafka.enabled }}
+        - name: kafka-ca-cert
+          secret:
+            secretName: {{ .Values.ppe.kafka.caCertSecret }}
+      {{- end }}
       {{- end }}

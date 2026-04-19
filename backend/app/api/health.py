@@ -23,6 +23,7 @@ async def readiness():
         "chat_enabled": settings.chat_enabled,
         "ovms_enabled": settings.ovms_enabled,
         "object_detection": object_detector.available if object_detector else False,
+        "ppe_enabled": settings.ppe_enabled,
     }
 
     if settings.ovms_enabled and settings.ovms_rest_url:

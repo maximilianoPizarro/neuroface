@@ -63,7 +63,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from app.api import health, recognition, training, models, analysis, chat, objects  # noqa: E402
+from app.api import health, recognition, training, models, analysis, chat, objects, ppe  # noqa: E402
 
 app.include_router(health.router)
 app.include_router(recognition.router)
@@ -72,3 +72,4 @@ app.include_router(models.router)
 app.include_router(analysis.router)
 app.include_router(chat.router)
 app.include_router(objects.router)
+app.include_router(ppe.router)

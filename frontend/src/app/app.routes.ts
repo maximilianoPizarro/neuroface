@@ -33,6 +33,11 @@ export const routes: Routes = [
       import('./components/objects/objects.component').then(m => m.ObjectsComponent),
   },
   {
+    path: 'ppe',
+    loadComponent: () =>
+      import('./components/ppe/ppe.component').then(m => m.PpeComponent),
+  },
+  {
     path: 'chat',
     loadComponent: () =>
       import('./components/chat/chat.component').then(m => m.ChatComponent),

@@ -7,7 +7,7 @@ CASCADES_DIR = os.path.join(_APP_DIR, "resources", "cascades")
 
 class Settings(BaseSettings):
     app_name: str = "NeuroFace API"
-    app_version: str = "1.2.0"
+    app_version: str = "1.3.0"
     debug: bool = False
 
     ai_model: str = "lbph"
@@ -47,6 +47,17 @@ class Settings(BaseSettings):
 
     object_detection_enabled: bool = True
     object_detection_confidence: float = 0.4
+
+    ppe_enabled: bool = False
+    ppe_endpoint: str = ""
+    ppe_classes: str = "hardhat,safety-vest,goggles"
+    ppe_confidence: float = 0.5
+    ppe_kafka_enabled: bool = False
+    ppe_kafka_bootstrap: str = ""
+    ppe_kafka_user: str = ""
+    ppe_kafka_password: str = ""
+    ppe_kafka_ca_cert: str = ""
+    ppe_kafka_topic: str = "cv.ppe.detections"
 
     class Config:
         env_prefix = "NEUROFACE_"

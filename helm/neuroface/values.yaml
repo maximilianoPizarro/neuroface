@@ -116,6 +116,19 @@ route:
   tls:
     termination: edge
 
+ppe:
+  enabled: false
+  endpoint: ""
+  classes: "hardhat,safety-vest,goggles"
+  confidence: "0.5"
+  kafka:
+    enabled: false
+    bootstrap: ""
+    user: ""
+    topic: "cv.ppe.detections"
+    secretName: "cdc-user"
+    caCertSecret: "cdc-cluster-cluster-ca-cert"
+
 persistence:
   enabled: true
   size: 1Gi

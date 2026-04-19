@@ -15,6 +15,8 @@ import {
   ChatResponse,
   ObjectDetectResponse,
   ObjectClassesResponse,
+  PpeDetectResponse,
+  PpeStatusResponse,
 } from '../models/interfaces';
 
 @Injectable({ providedIn: 'root' })
@@ -110,5 +112,15 @@ export class ApiService {
 
   getObjectDetectorStatus(): Observable<Record<string, unknown>> {
     return this.http.get<Record<string, unknown>>(`${this.baseUrl}/objects/status`);
+  }
+
+  ppeDetect(imageBase64: string, confidence?: number): Observable<PpeDetectResponse> {
+    const body: { image: string; confidence?: number } = { image: imageBase64 };
+    if (confidence !== undefined) body.confidence = confidence;
+    return this.http.post<PpeDetectResponse>(`${this.baseUrl}/ppe/detect`, body);
+  }
+
+  ppeStatus(): Observable<PpeStatusResponse> {
+    return this.http.get<PpeStatusResponse>(`${this.baseUrl}/ppe/status`);
   }
 }

@@ -27,7 +27,7 @@ import { MatListModule } from '@angular/material/list';
       <img src="assets/icons/icon.svg" alt="NeuroFace" class="toolbar-logo">
       <span class="app-title">NeuroFace</span>
       <span class="spacer"></span>
-      <span class="app-subtitle">Facial Recognition &amp; Object Detection</span>
+      <span class="app-subtitle">Facial Recognition &amp; PPE Safety Detection</span>
     </mat-toolbar>
 
     <mat-sidenav-container class="sidenav-container">
@@ -52,6 +52,10 @@ import { MatListModule } from '@angular/material/list';
           <a mat-list-item routerLink="/objects" routerLinkActive="active-link">
             <mat-icon matListItemIcon>category</mat-icon>
             <span matListItemTitle>Object Detection</span>
+          </a>
+          <a mat-list-item routerLink="/ppe" routerLinkActive="active-link">
+            <mat-icon matListItemIcon>health_and_safety</mat-icon>
+            <span matListItemTitle>PPE Safety</span>
           </a>
           <a mat-list-item routerLink="/model-config" routerLinkActive="active-link">
             <mat-icon matListItemIcon>settings</mat-icon>
@@ -93,7 +97,7 @@ import { MatListModule } from '@angular/material/list';
               <a href="https://maximilianopizarro.github.io/" target="_blank" rel="noopener" class="footer-author">
                 maximilianoPizarro
               </a>
-              <span class="footer-version">v1.2.0</span>
+              <span class="footer-version">v1.3.0</span>
             </div>
           </div>
         </footer>

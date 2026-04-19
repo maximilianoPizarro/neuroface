@@ -151,3 +151,37 @@ export interface FaceFeatures {
   face_height?: number;
   aspect_ratio?: number;
 }
+
+export interface PpeBbox {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+}
+
+export interface PpeDetection {
+  class_id: number;
+  class_name: string;
+  confidence: number;
+  bbox: PpeBbox;
+}
+
+export interface PpeDetectResponse {
+  objects: PpeDetection[];
+  count: number;
+  summary: Record<string, number>;
+  ppe_status: 'compliant' | 'violation' | 'no_persons';
+  person_count: number;
+  present_ppe: string[];
+  missing_ppe: string[];
+  expected_ppe: string[];
+  llm_analysis?: string | null;
+}
+
+export interface PpeStatusResponse {
+  enabled: boolean;
+  endpoint: string | null;
+  reachable?: boolean;
+  expected_ppe: string[];
+  yolo_health?: Record<string, unknown>;
+}

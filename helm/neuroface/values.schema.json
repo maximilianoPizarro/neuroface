@@ -482,6 +482,80 @@
         }
       }
     },
+    "ppe": {
+      "type": "object",
+      "title": "PPE Safety Detection",
+      "description": "YOLO-based Personal Protective Equipment detection via external serving endpoint",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "title": "Enable PPE Detection",
+          "description": "Enable the PPE safety detection feature (requires an external YOLO PPE serving endpoint)",
+          "default": false
+        },
+        "endpoint": {
+          "type": "string",
+          "title": "YOLO PPE Endpoint",
+          "description": "URL of the YOLO PPE serving REST API (e.g. http://yolo-ppe-serving.neuroface.svc:8000)",
+          "default": ""
+        },
+        "classes": {
+          "type": "string",
+          "title": "Expected PPE Classes",
+          "description": "Comma-separated list of expected PPE items for compliance checking",
+          "default": "hardhat,safety-vest,goggles"
+        },
+        "confidence": {
+          "type": "string",
+          "title": "Confidence Threshold",
+          "description": "Minimum confidence score (0.0-1.0) for YOLO detections",
+          "default": "0.5"
+        },
+        "kafka": {
+          "type": "object",
+          "title": "PPE Kafka Producer",
+          "description": "Publish PPE detection events to a Kafka topic from the backend",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "title": "Enable Kafka Producer",
+              "description": "Publish each PPE detection to Kafka (requires ppe.enabled=true)",
+              "default": false
+            },
+            "bootstrap": {
+              "type": "string",
+              "title": "Bootstrap Servers",
+              "description": "Kafka bootstrap servers (e.g. cdc-cluster-kafka-bootstrap.kafka-cdc.svc:9093)",
+              "default": ""
+            },
+            "user": {
+              "type": "string",
+              "title": "SASL Username",
+              "description": "SCRAM-SHA-512 username for Kafka authentication",
+              "default": ""
+            },
+            "topic": {
+              "type": "string",
+              "title": "Kafka Topic",
+              "description": "Destination topic for PPE compliance events",
+              "default": "cv.ppe.detections"
+            },
+            "secretName": {
+              "type": "string",
+              "title": "Password Secret Name",
+              "description": "Kubernetes Secret containing the Kafka user password (key: password)",
+              "default": "cdc-user"
+            },
+            "caCertSecret": {
+              "type": "string",
+              "title": "CA Certificate Secret",
+              "description": "Kubernetes Secret containing the Kafka cluster CA certificate (key: ca.crt)",
+              "default": "cdc-cluster-cluster-ca-cert"
+            }
+          }
+        }
+      }
+    },
     "route": {
       "type": "object",
       "title": "OpenShift Route",
