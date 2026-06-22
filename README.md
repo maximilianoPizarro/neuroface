@@ -42,114 +42,39 @@ Facial recognition and object detection web application based on the [reconocimi
 
 ## Architecture Diagram
 
-```mermaid
-graph LR
-  subgraph Frontend["Frontend — Angular 17 + Nginx"]
-    CAM["WebRTC Camera"]
-    UI["Angular Material UI"]
-    OBJ_UI["Object Detection"]
-    CHAT_UI["AI Chat"]
-  end
+<p align="center">
+  <img src="docs/screenshots/rh_architecture.png" alt="System Architecture" width="800">
+</p>
 
-  subgraph Backend["Backend — FastAPI + UBI9"]
-    API["REST API\nUvicorn :8080"]
-    subgraph Engines["AI Engines"]
-      CV["OpenCV\nHaar Cascades"]
-      OVMS_C["OpenVINO\nOVMS Client"]
-      YOLO["YOLOv4-tiny\n80 COCO Classes"]
-      LBPH["LBPH\nRecognizer"]
-    end
-  end
+## PPE Detection & Sequence Flow
 
-  subgraph External["OpenShift AI"]
-    MM["ModelMesh\n:8008"]
-    FACE_M["face-detection\nretail-0005"]
-    LLM["LLM Endpoint\nGranite / LiteLLM"]
-  end
-
-  CAM -->|POST /api/recognize| API
-  CAM -->|POST /api/objects/detect| API
-  CHAT_UI -->|POST /api/chat| API
-  UI -->|PUT /api/models| API
-
-  API --> CV
-  API --> OVMS_C
-  API --> YOLO
-  API --> LBPH
-  OVMS_C -->|KServe V2| MM
-  MM --> FACE_M
-  API -->|OpenAI API| LLM
-```
+<p align="center">
+  <img src="docs/screenshots/rh_sequence.png" alt="PPE Sequence" width="800">
+</p>
 
 ## Face Recognition Flow
 
-```mermaid
-flowchart TD
-  A["Camera captures frame\n(base64)"] --> B["POST /api/recognize"]
-  B --> C{"Detection\nmethod?"}
-  C -- opencv --> D["OpenCV Haar Cascade\ndetectMultiScale"]
-  C -- openvino --> E["OVMS REST call\nKServe V2 infer"]
-  D --> F["Face bounding boxes\n(x, y, w, h)"]
-  E --> F
-  F --> G{"Model\ntrained?"}
-  G -- Yes --> H["LBPH predict\non each ROI"]
-  G -- No --> I["label = unknown\nconfidence = 0"]
-  H --> J{"confidence\n< 85?"}
-  J -- Yes --> K["Known person\nlabel + confidence"]
-  J -- No --> I
-  I --> L["Return faces[]\n+ detection_method"]
-  K --> L
-  L --> M["Draw overlay\n+ multi-person grid"]
-```
+<p align="center">
+  <img src="docs/screenshots/rh_face_flow.png" alt="Face Recognition Flow" width="800">
+</p>
 
 ## Object Detection Flow
 
-```mermaid
-flowchart TD
-  A["Camera captures frame"] --> B["POST /api/objects/detect"]
-  B --> C["OpenCV DNN\nYOLOv4-tiny"]
-  C --> D["blobFromImage\n416x416, normalize"]
-  D --> E["Forward pass\nthrough network"]
-  E --> F["Parse detections\n80 COCO classes"]
-  F --> G["NMS filter\nconfidence > 0.4"]
-  G --> H{"Objects\nfound?"}
-  H -- Yes --> I["Return objects[]\n+ summary counts"]
-  H -- No --> J["Return empty\ncount = 0"]
-  I --> K["Draw bounding boxes\ncolor per class"]
-  J --> K
-```
+<p align="center">
+  <img src="docs/screenshots/rh_object_flow.png" alt="Object Detection Flow" width="800">
+</p>
 
 ## Training Flow
 
-```mermaid
-flowchart TD
-  A["User enters label\n(person name)"] --> B["Capture images\nfrom camera"]
-  B --> C["POST /api/images\nsave to /data/images/label/"]
-  C --> D["POST /api/train"]
-  D --> E{"Detection\nmethod?"}
-  E -- opencv --> F["Haar Cascade\non each image"]
-  E -- openvino --> G["OVMS detect\non each image"]
-  F --> H["Extract face ROIs\n(grayscale)"]
-  G --> H
-  H --> I["LBPH train\non all ROIs + labels"]
-  I --> J["Save training.yml\n+ model.pickle"]
-  J --> K["Model trained\nlabels + face count"]
-```
+<p align="center">
+  <img src="docs/screenshots/rh_training_flow.png" alt="Training Flow" width="800">
+</p>
 
 ## AI Chat Analysis Flow
 
-```mermaid
-flowchart TD
-  A["User sends message\n+ optional image"] --> B{"Image\nattached?"}
-  B -- Yes --> C["Face analysis\nanalyze_faces()"]
-  C --> D["Object detection\nYOLOv4-tiny"]
-  D --> E["Build context:\nfaces + objects + method"]
-  B -- No --> F["User message only"]
-  E --> G["Compose prompt:\nsystem + context + question"]
-  F --> G
-  G --> H["POST to LLM\nOpenAI-compatible API"]
-  H --> I["Return response\n+ analysis data"]
-```
+<p align="center">
+  <img src="docs/screenshots/rh_chat_flow.png" alt="AI Chat Flow" width="800">
+</p>
 
 ---
 
