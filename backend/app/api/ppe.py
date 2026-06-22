@@ -91,6 +91,8 @@ class PpeDetectResponse(BaseModel):
 
 @router.get("/status")
 async def ppe_status():
+    from app.models.ppe_data_store import get_status as get_data_status
+
     if not settings.ppe_enabled or not settings.ppe_endpoint:
         return {
             "enabled": False,
@@ -115,6 +117,7 @@ async def ppe_status():
         "yolo_health": health,
         "kafka_enabled": settings.ppe_kafka_enabled,
         "kafka_topic": settings.ppe_kafka_topic if settings.ppe_kafka_enabled else None,
+        "data_persistence": get_data_status(),
     }
 
 
@@ -199,6 +202,9 @@ async def ppe_detect(req: PpeDetectRequest):
         detections=detections,
         llm_analysis=llm_analysis,
     )
+
+    from app.models.ppe_data_store import upload_detection
+    upload_detection(img, detections, ppe_status)
 
     return PpeDetectResponse(
         objects=objects,

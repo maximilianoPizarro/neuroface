@@ -7,7 +7,7 @@ CASCADES_DIR = os.path.join(_APP_DIR, "resources", "cascades")
 
 class Settings(BaseSettings):
     app_name: str = "NeuroFace API"
-    app_version: str = "1.3.0"
+    app_version: str = "1.4.0"
     debug: bool = False
 
     ai_model: str = "lbph"
@@ -58,6 +58,16 @@ class Settings(BaseSettings):
     ppe_kafka_password: str = ""
     ppe_kafka_ca_cert: str = ""
     ppe_kafka_topic: str = "cv.ppe.detections"
+
+    ppe_data_upload_enabled: bool = False
+    ppe_data_s3_endpoint: str = ""
+    ppe_data_s3_bucket: str = "models"
+    ppe_data_s3_prefix: str = "ppe-detection/training-data"
+    ppe_data_s3_access_key: str = ""
+    ppe_data_s3_secret_key: str = ""
+    ppe_data_s3_region: str = ""
+    ppe_data_s3_secure: bool = True
+    ppe_data_sampling_rate: float = 1.0
 
     class Config:
         env_prefix = "NEUROFACE_"

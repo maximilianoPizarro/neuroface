@@ -1,7 +1,7 @@
 backend:
   image:
     repository: quay.io/maximilianopizarro/neuroface-backend
-    tag: v1.2.0
+    tag: v1.4.0
     pullPolicy: Always
   replicas: 1
   port: 8080
@@ -18,7 +18,7 @@ backend:
 frontend:
   image:
     repository: quay.io/maximilianopizarro/neuroface-frontend
-    tag: v1.2.0
+    tag: v1.4.0
     pullPolicy: Always
   replicas: 1
   port: 8080
@@ -121,6 +121,11 @@ ppe:
   endpoint: ""
   classes: "hardhat,safety-vest,goggles"
   confidence: "0.5"
+  serving:
+    image:
+      repository: quay.io/maximilianopizarro/neuroface-ppe-serving
+      tag: v1.4.0
+      pullPolicy: IfNotPresent
   kafka:
     enabled: false
     bootstrap: ""
@@ -128,6 +133,15 @@ ppe:
     topic: "cv.ppe.detections"
     secretName: "cdc-user"
     caCertSecret: "cdc-cluster-cluster-ca-cert"
+  dataPersistence:
+    enabled: false
+    s3Endpoint: ""
+    s3Bucket: "models"
+    s3Prefix: "ppe-detection/training-data"
+    s3AccessKey: ""
+    s3SecretKey: ""
+    s3Secure: true
+    samplingRate: 1.0
 
 persistence:
   enabled: true

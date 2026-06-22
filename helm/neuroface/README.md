@@ -1,14 +1,20 @@
 # NeuroFace Helm Chart
 
 [![Artifact Hub](https://img.shields.io/badge/Artifact%20Hub-neuroface-blue?logo=artifacthub)](https://artifacthub.io/packages/helm/neuroface/neuroface)
-[![Version](https://img.shields.io/badge/version-v1.2.0-green)](https://github.com/maximilianoPizarro/neuroface/releases/tag/v1.2.0)
+[![Version](https://img.shields.io/badge/version-v1.4.0-green)](https://github.com/maximilianoPizarro/neuroface/releases/tag/v1.4.0)
 [![Quay.io Backend](https://img.shields.io/badge/quay.io-backend-red?logo=redhat)](https://quay.io/repository/maximilianopizarro/neuroface-backend)
 [![Quay.io Frontend](https://img.shields.io/badge/quay.io-frontend-red?logo=redhat)](https://quay.io/repository/maximilianopizarro/neuroface-frontend)
 [![OpenShift](https://img.shields.io/badge/OpenShift-Ready-EE0000?logo=redhatopenshift)](https://developers.redhat.com/developer-sandbox)
 
 Facial recognition and object detection web application built with **FastAPI** (Python) and **Angular 17**, containerized with Red Hat UBI9 certified images for **OpenShift**.
 
-**v1.2.0** — Object detection (YOLOv4-tiny, 80 COCO classes), multi-person face grid, enhanced AI chat with object context.
+**v1.4.0** — Pre-built YOLO PPE serving image with KServe v1+v2 protocol, PPE detection data persistence for retraining via S3/MinIO.
+
+### What's New in v1.4.0
+
+- **Pre-built PPE serving container** (`neuroface-ppe-serving`) — Cold start < 60s, all dependencies pre-installed
+- **KServe v2 inference protocol** — `/v2/models/yolo-ppe/infer` + `/v2/models/yolo-ppe/ready` alongside existing v1
+- **PPE data persistence** — Upload detection frames + YOLO labels to S3/MinIO for retraining workbenches
 
 > **Full documentation:** [maximilianopizarro.github.io/neuroface](https://maximilianopizarro.github.io/neuroface/)
 
@@ -140,13 +146,13 @@ When `ovms.externalUrl` is set, no standalone OVMS is deployed — the backend c
 | Parameter | Description | Default |
 |-----------|-------------|---------|
 | `backend.image.repository` | Backend image | `quay.io/maximilianopizarro/neuroface-backend` |
-| `backend.image.tag` | Backend image tag | `v1.2.0` |
+| `backend.image.tag` | Backend image tag | `v1.4.0` |
 | `backend.replicas` | Backend replicas | `1` |
 | `backend.aiModel` | AI model type (lbph / dlib) | `lbph` |
 | `backend.resources.limits.cpu` | Backend CPU limit | `500m` |
 | `backend.resources.limits.memory` | Backend memory limit | `512Mi` |
 | `frontend.image.repository` | Frontend image | `quay.io/maximilianopizarro/neuroface-frontend` |
-| `frontend.image.tag` | Frontend image tag | `v1.2.0` |
+| `frontend.image.tag` | Frontend image tag | `v1.4.0` |
 | `frontend.replicas` | Frontend replicas | `1` |
 | `route.enabled` | Create OpenShift Route | `true` |
 | `route.host` | Route hostname (auto if empty) | `""` |
@@ -158,6 +164,15 @@ When `ovms.externalUrl` is set, no standalone OVMS is deployed — the backend c
 | `ovms.confidenceThreshold` | Detection confidence threshold | `0.5` |
 | `ovms.defaultDetectionMethod` | Initial detection method | `opencv` |
 | `chat.enabled` | Enable AI chat feature | `true` |
+| `ppe.enabled` | Enable PPE safety detection | `false` |
+| `ppe.endpoint` | PPE YOLO serving URL | `""` |
+| `ppe.classes` | Expected PPE classes (comma-separated) | `hardhat,safety-vest,goggles` |
+| `ppe.serving.image.tag` | PPE serving image tag | `v1.4.0` |
+| `ppe.dataPersistence.enabled` | Upload detections to S3/MinIO for retraining | `false` |
+| `ppe.dataPersistence.s3Endpoint` | S3/MinIO endpoint URL | `""` |
+| `ppe.dataPersistence.s3Bucket` | Target bucket | `models` |
+| `ppe.dataPersistence.s3Prefix` | Key prefix for images/labels | `ppe-detection/training-data` |
+| `ppe.dataPersistence.samplingRate` | Fraction of frames to persist (0.0-1.0) | `1.0` |
 
 ## API Endpoints
 
@@ -176,17 +191,30 @@ When `ovms.externalUrl` is set, no standalone OVMS is deployed — the backend c
 | `/api/objects/classes` | GET | List all 80 detectable COCO classes |
 | `/api/objects/status` | GET | Object detector status |
 | `/api/chat` | POST | AI chat with face + object analysis context |
+| `/api/ppe/detect` | POST | PPE compliance detection via YOLO serving |
+| `/api/ppe/status` | GET | PPE serving status + data persistence config |
+
+### PPE Serving Endpoints (neuroface-ppe-serving)
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/health` | GET | Liveness + model info |
+| `/v1/predict` | POST | KServe v1 — raw JPEG bytes |
+| `/v2/models/yolo-ppe/infer` | POST | KServe v2 — octet-stream or JSON tensor |
+| `/v2/models/yolo-ppe/ready` | GET | Model readiness |
+| `/v2/models/yolo-ppe` | GET | Model metadata |
+| `/v2/health/live` | GET | v2 liveness |
+| `/v2/health/ready` | GET | v2 readiness |
 
 ## Container Images
 
 | Image | Tag | Description |
 |-------|-----|-------------|
-| `quay.io/maximilianopizarro/neuroface-backend` | `v1.2.0` | Object detection + multi-person grid |
-| `quay.io/maximilianopizarro/neuroface-frontend` | `v1.2.0` | Object detection + enhanced chat |
-| `quay.io/maximilianopizarro/neuroface-backend` | `v1.1.1` | OpenVINO + mobile flash |
-| `quay.io/maximilianopizarro/neuroface-frontend` | `v1.1.1` | Fullscreen training |
-| `quay.io/maximilianopizarro/neuroface-backend` | `latest` / `v1.0.1` | Without OpenVINO |
-| `quay.io/maximilianopizarro/neuroface-frontend` | `latest` / `v1.0.1` | Without OpenVINO UI |
+| `quay.io/maximilianopizarro/neuroface-backend` | `v1.4.0` | PPE data persistence + S3 upload |
+| `quay.io/maximilianopizarro/neuroface-frontend` | `v1.4.0` | PPE UI + all features |
+| `quay.io/maximilianopizarro/neuroface-ppe-serving` | `v1.4.0` | Pre-built YOLO PPE (KServe v1+v2) |
+| `quay.io/maximilianopizarro/neuroface-backend` | `v1.3.0` | PPE + Kafka |
+| `quay.io/maximilianopizarro/neuroface-frontend` | `v1.3.0` | PPE Safety UI |
 
 ## Uninstall
 
