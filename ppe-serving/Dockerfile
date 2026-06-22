@@ -6,7 +6,8 @@ COPY requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu \
     -r /tmp/requirements.txt && \
     pip uninstall -y opencv-python 2>/dev/null || true && \
-    pip install --no-cache-dir opencv-python-headless==4.11.0.86 && \
+    pip install --no-cache-dir --force-reinstall --no-deps opencv-python-headless==4.11.0.86 && \
+    python -c "import cv2; print('cv2 OK:', cv2.__version__)" && \
     rm /tmp/requirements.txt
 
 COPY server.py /opt/app-root/src/server.py
