@@ -124,7 +124,7 @@ ppe:
   serving:
     image:
       repository: quay.io/maximilianopizarro/neuroface-ppe-serving
-      tag: v1.4.0
+      tag: v1.4.1
       pullPolicy: IfNotPresent
   kafka:
     enabled: false
