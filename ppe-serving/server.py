@@ -27,7 +27,7 @@ MODEL_PATH = os.environ.get("MODEL_PATH", "/mnt/models/best.pt")
 MODEL_NAME = os.environ.get("MODEL_NAME", "yolo-ppe")
 CONFIDENCE = float(os.environ.get("CONFIDENCE", "0.5"))
 
-app = FastAPI(title="YOLO PPE Serving", version="1.4.0")
+app = FastAPI(title="YOLO PPE Serving", version="1.4.1")
 
 _model = None
 _model_ready = False

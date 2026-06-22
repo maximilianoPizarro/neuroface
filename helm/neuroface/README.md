@@ -1,14 +1,19 @@
 # NeuroFace Helm Chart
 
 [![Artifact Hub](https://img.shields.io/badge/Artifact%20Hub-neuroface-blue?logo=artifacthub)](https://artifacthub.io/packages/helm/neuroface/neuroface)
-[![Version](https://img.shields.io/badge/version-v1.4.0-green)](https://github.com/maximilianoPizarro/neuroface/releases/tag/v1.4.0)
+[![Version](https://img.shields.io/badge/version-v1.4.1-green)](https://github.com/maximilianoPizarro/neuroface/releases/tag/v1.4.1)
 [![Quay.io Backend](https://img.shields.io/badge/quay.io-backend-red?logo=redhat)](https://quay.io/repository/maximilianopizarro/neuroface-backend)
 [![Quay.io Frontend](https://img.shields.io/badge/quay.io-frontend-red?logo=redhat)](https://quay.io/repository/maximilianopizarro/neuroface-frontend)
 [![OpenShift](https://img.shields.io/badge/OpenShift-Ready-EE0000?logo=redhatopenshift)](https://developers.redhat.com/developer-sandbox)
 
 Facial recognition and object detection web application built with **FastAPI** (Python) and **Angular 17**, containerized with Red Hat UBI9 certified images for **OpenShift**.
 
-**v1.4.0** — Pre-built YOLO PPE serving image with KServe v1+v2 protocol, PPE detection data persistence for retraining via S3/MinIO.
+**v1.4.1** — Red Hat ecosystem documentation, PPE serving (KServe v1+v2), data persistence via S3/MinIO.
+
+### What's New in v1.4.1
+
+- **Red Hat Validated Patterns documentation** — Architecture and sequence diagrams
+- **Helm chart 1.4.1** — Updated default image tags
 
 ### What's New in v1.4.0
 
@@ -146,13 +151,13 @@ When `ovms.externalUrl` is set, no standalone OVMS is deployed — the backend c
 | Parameter | Description | Default |
 |-----------|-------------|---------|
 | `backend.image.repository` | Backend image | `quay.io/maximilianopizarro/neuroface-backend` |
-| `backend.image.tag` | Backend image tag | `v1.4.0` |
+| `backend.image.tag` | Backend image tag | `v1.4.1` |
 | `backend.replicas` | Backend replicas | `1` |
 | `backend.aiModel` | AI model type (lbph / dlib) | `lbph` |
 | `backend.resources.limits.cpu` | Backend CPU limit | `500m` |
 | `backend.resources.limits.memory` | Backend memory limit | `512Mi` |
 | `frontend.image.repository` | Frontend image | `quay.io/maximilianopizarro/neuroface-frontend` |
-| `frontend.image.tag` | Frontend image tag | `v1.4.0` |
+| `frontend.image.tag` | Frontend image tag | `v1.4.1` |
 | `frontend.replicas` | Frontend replicas | `1` |
 | `route.enabled` | Create OpenShift Route | `true` |
 | `route.host` | Route hostname (auto if empty) | `""` |
@@ -167,7 +172,7 @@ When `ovms.externalUrl` is set, no standalone OVMS is deployed — the backend c
 | `ppe.enabled` | Enable PPE safety detection | `false` |
 | `ppe.endpoint` | PPE YOLO serving URL | `""` |
 | `ppe.classes` | Expected PPE classes (comma-separated) | `hardhat,safety-vest,goggles` |
-| `ppe.serving.image.tag` | PPE serving image tag | `v1.4.0` |
+| `ppe.serving.image.tag` | PPE serving image tag | `v1.4.1` |
 | `ppe.dataPersistence.enabled` | Upload detections to S3/MinIO for retraining | `false` |
 | `ppe.dataPersistence.s3Endpoint` | S3/MinIO endpoint URL | `""` |
 | `ppe.dataPersistence.s3Bucket` | Target bucket | `models` |
@@ -210,9 +215,9 @@ When `ovms.externalUrl` is set, no standalone OVMS is deployed — the backend c
 
 | Image | Tag | Description |
 |-------|-----|-------------|
-| `quay.io/maximilianopizarro/neuroface-backend` | `v1.4.0` | PPE data persistence + S3 upload |
-| `quay.io/maximilianopizarro/neuroface-frontend` | `v1.4.0` | PPE UI + all features |
-| `quay.io/maximilianopizarro/neuroface-ppe-serving` | `v1.4.0` | Pre-built YOLO PPE (KServe v1+v2) |
+| `quay.io/maximilianopizarro/neuroface-backend` | `v1.4.1` | PPE data persistence + S3 upload |
+| `quay.io/maximilianopizarro/neuroface-frontend` | `v1.4.1` | PPE UI + all features |
+| `quay.io/maximilianopizarro/neuroface-ppe-serving` | `v1.4.1` | Pre-built YOLO PPE (KServe v1+v2) |
 | `quay.io/maximilianopizarro/neuroface-backend` | `v1.3.0` | PPE + Kafka |
 | `quay.io/maximilianopizarro/neuroface-frontend` | `v1.3.0` | PPE Safety UI |
 

@@ -1,5 +1,5 @@
 [![Artifact Hub](https://img.shields.io/badge/Artifact%20Hub-neuroface-blue?logo=artifacthub)](https://artifacthub.io/packages/helm/neuroface/neuroface)
-[![Version](https://img.shields.io/badge/version-v1.2.0-green)](https://github.com/maximilianoPizarro/neuroface/releases/tag/v1.2.0)
+[![Version](https://img.shields.io/badge/version-v1.4.1-green)](https://github.com/maximilianoPizarro/neuroface/releases/tag/v1.4.1)
 [![Quay.io Backend](https://img.shields.io/badge/quay.io-backend-red?logo=redhat)](https://quay.io/repository/maximilianopizarro/neuroface-backend)
 [![Quay.io Frontend](https://img.shields.io/badge/quay.io-frontend-red?logo=redhat)](https://quay.io/repository/maximilianopizarro/neuroface-frontend)
 [![OpenShift](https://img.shields.io/badge/OpenShift-Ready-EE0000?logo=redhatopenshift)](https://developers.redhat.com/developer-sandbox)
@@ -21,6 +21,18 @@ NeuroFace is a facial recognition and object detection web application built wit
 
 **Object Detection:**
 - **YOLOv4-tiny** — 80 COCO classes pre-trained, via OpenCV DNN
+
+### What's New in v1.4.1
+
+- **Red Hat Validated Patterns documentation** — Architecture and sequence diagrams on GitHub Pages
+- **Ecosystem journey** — Visual flow across OpenShift, OpenShift AI, AMQ Streams, and S3/ODF
+- **Helm chart 1.4.1** — Updated default image tags for backend, frontend, and PPE serving
+
+### What's New in v1.4.0
+
+- **PPE Serving container** — Pre-built YOLOv8 PPE detection with KServe v1+v2 protocol
+- **Kafka integration** — PPE detection events published to AMQ Streams
+- **Data persistence** — S3/MinIO upload of frames and YOLO labels for retraining
 
 ### What's New in v1.2.0
 
@@ -118,8 +130,9 @@ helm install neuroface neuroface/neuroface \
 | Value | Default | Description |
 |-------|---------|-------------|
 | `backend.aiModel` | `lbph` | Recognition model: `lbph` or `dlib` |
-| `backend.image.tag` | `v1.2.0` | Backend container image tag |
-| `frontend.image.tag` | `v1.2.0` | Frontend container image tag |
+| `backend.image.tag` | `v1.4.1` | Backend container image tag |
+| `frontend.image.tag` | `v1.4.1` | Frontend container image tag |
+| `ppe.serving.image.tag` | `v1.4.1` | PPE YOLOv8 KServe serving image tag |
 | `ovms.enabled` | `true` | Enable OpenVINO face detection |
 | `ovms.externalUrl` | `""` | External OVMS/ModelMesh URL. When set, no standalone OVMS is deployed |
 | `ovms.modelName` | `face-detection-retail-0005` | Face detection model name on OVMS |
@@ -385,13 +398,11 @@ Switch between detection methods at runtime:
 | `quay.io/maximilianopizarro/neuroface-backend` | `latest` / `v1.0.1` | Stable release without OpenVINO |
 | `quay.io/maximilianopizarro/neuroface-backend` | `v1.1.0` | With OpenVINO integration |
 | `quay.io/maximilianopizarro/neuroface-backend` | `v1.1.1` | Red Hat UI + mobile flash |
-| `quay.io/maximilianopizarro/neuroface-backend` | `v1.2.0` | Object detection + multi-person grid |
-| `quay.io/maximilianopizarro/neuroface-frontend` | `latest` / `v1.0.1` | Stable release |
-| `quay.io/maximilianopizarro/neuroface-frontend` | `v1.1.0` | With OpenVINO UI controls |
-| `quay.io/maximilianopizarro/neuroface-frontend` | `v1.1.1` | Red Hat design + fullscreen training |
-| `quay.io/maximilianopizarro/neuroface-frontend` | `v1.2.0` | Object detection + enhanced chat |
+| `quay.io/maximilianopizarro/neuroface-backend` | `v1.4.1` | PPE persistence, Kafka, object detection |
+| `quay.io/maximilianopizarro/neuroface-frontend` | `v1.4.1` | PPE UI, object detection, enhanced chat |
+| `quay.io/maximilianopizarro/neuroface-ppe-serving` | `v1.4.1` | YOLOv8 PPE KServe v1+v2 inference |
 
-## API Endpoints (v1.2.0)
+## API Endpoints (v1.4.1)
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|

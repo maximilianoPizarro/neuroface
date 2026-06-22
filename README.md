@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="https://artifacthub.io/packages/helm/neuroface/neuroface"><img src="https://img.shields.io/badge/Artifact%20Hub-neuroface-blue?logo=artifacthub" alt="Artifact Hub"></a>
-  <a href="https://github.com/maximilianoPizarro/neuroface/releases/tag/v1.2.0"><img src="https://img.shields.io/badge/version-v1.2.0-green" alt="Version"></a>
+  <a href="https://github.com/maximilianoPizarro/neuroface/releases/tag/v1.4.1"><img src="https://img.shields.io/badge/version-v1.4.1-green" alt="Version"></a>
   <a href="https://quay.io/repository/maximilianopizarro/neuroface-backend"><img src="https://img.shields.io/badge/quay.io-backend-red?logo=redhat" alt="Quay.io"></a>
   <a href="https://quay.io/repository/maximilianopizarro/neuroface-frontend"><img src="https://img.shields.io/badge/quay.io-frontend-red?logo=redhat" alt="Quay.io"></a>
   <a href="https://developers.redhat.com/developer-sandbox"><img src="https://img.shields.io/badge/OpenShift-Ready-EE0000?logo=redhatopenshift" alt="OpenShift"></a>
@@ -15,7 +15,7 @@
 
 Facial recognition and object detection web application based on the [reconocimiento-facial](https://github.com/maximilianoPizarro/reconocimiento-facial) archetype. Built with **FastAPI** (Python) and **Angular 17**, containerized with Red Hat UBI9 certified images for **Podman Desktop** and **OpenShift**.
 
-**v1.2.0** — Object detection (YOLOv4-tiny, 80 COCO classes), multi-person face grid, enhanced AI chat with object context.
+**v1.4.1** — Red Hat ecosystem documentation, PPE serving (KServe v2), Kafka events, and S3 data persistence.
 
 ### Video Demo
 
@@ -125,7 +125,7 @@ podman-compose up -d --build
 ### Build and Push to Quay.io
 
 ```bash
-./build-push-quay.sh [quay-namespace] [--tag v1.2.0]
+./build-push-quay.sh [quay-namespace] [--tag v1.4.1]
 ```
 
 Default namespace: `maximilianopizarro`. Requires `podman login quay.io`.
@@ -212,8 +212,8 @@ COCO classes: person, bicycle, car, motorbike, aeroplane, bus, train, truck, boa
 | Value | Default | Description |
 |-------|---------|-------------|
 | `backend.aiModel` | `lbph` | Recognition model |
-| `backend.image.tag` | `v1.2.0` | Backend image tag |
-| `frontend.image.tag` | `v1.2.0` | Frontend image tag |
+| `backend.image.tag` | `v1.4.1` | Backend image tag |
+| `frontend.image.tag` | `v1.4.1` | Frontend image tag |
 | `ovms.enabled` | `true` | Enable OpenVINO detection |
 | `ovms.externalUrl` | `""` | External OVMS/ModelMesh REST URL |
 | `ovms.modelName` | `face-detection-retail-0005` | Model name on OVMS |
@@ -253,7 +253,7 @@ neuroface/
 │   │   └── services/           # API + Camera services
 │   ├── nginx.conf
 │   └── Dockerfile
-├── helm/neuroface/             # Helm chart (v1.2.0)
+├── helm/neuroface/             # Helm chart (v1.4.1)
 ├── docs/                       # GitHub Pages + screenshots
 ├── .github/workflows/          # CI/CD
 ├── devfile.yaml                # Red Hat Dev Spaces
@@ -271,11 +271,9 @@ neuroface/
 | `quay.io/maximilianopizarro/neuroface-backend` | `latest` / `v1.0.1` | Without OpenVINO |
 | `quay.io/maximilianopizarro/neuroface-backend` | `v1.1.0` | With OpenVINO integration |
 | `quay.io/maximilianopizarro/neuroface-backend` | `v1.1.1` | Red Hat UI + mobile flash |
-| `quay.io/maximilianopizarro/neuroface-backend` | `v1.2.0` | Object detection + multi-person grid |
-| `quay.io/maximilianopizarro/neuroface-frontend` | `latest` / `v1.0.1` | Without OpenVINO UI |
-| `quay.io/maximilianopizarro/neuroface-frontend` | `v1.1.0` | With OpenVINO UI controls |
-| `quay.io/maximilianopizarro/neuroface-frontend` | `v1.1.1` | Red Hat design + fullscreen training |
-| `quay.io/maximilianopizarro/neuroface-frontend` | `v1.2.0` | Object detection + enhanced chat |
+| `quay.io/maximilianopizarro/neuroface-backend` | `v1.4.1` | PPE persistence, Kafka, object detection |
+| `quay.io/maximilianopizarro/neuroface-frontend` | `v1.4.1` | PPE UI, object detection, enhanced chat |
+| `quay.io/maximilianopizarro/neuroface-ppe-serving` | `v1.4.1` | YOLOv8 PPE KServe v1+v2 |
 
 ---
 

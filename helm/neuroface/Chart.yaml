@@ -29,9 +29,9 @@ annotations:
       url: https://github.com/maximilianoPizarro/neuroface
   artifacthub.io/images: |
     - name: backend
-      image: quay.io/maximilianopizarro/neuroface-backend:v1.4.0
+      image: quay.io/maximilianopizarro/neuroface-backend:v1.4.1
     - name: frontend
-      image: quay.io/maximilianopizarro/neuroface-frontend:v1.4.0
+      image: quay.io/maximilianopizarro/neuroface-frontend:v1.4.1
     - name: ppe-serving
       image: quay.io/maximilianopizarro/neuroface-ppe-serving:v1.4.1
     - name: ovms
