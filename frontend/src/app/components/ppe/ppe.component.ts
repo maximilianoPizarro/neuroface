@@ -225,8 +225,11 @@ export class PpeComponent implements OnInit, OnDestroy {
     this.detect(base64);
   }
 
-  onAutoToggle(): void {
+  async onAutoToggle(): Promise<void> {
     if (this.autoDetect) {
+      if (this.cam && !this.cam.active) {
+        await this.cam.toggle();
+      }
       this.startAutoDetect();
     } else {
       this.stopAutoDetect();
