@@ -132,7 +132,7 @@ ppe:
     user: ""
     topic: "cv.ppe.detections"
     secretName: "cdc-user"
-    caCertSecret: "cdc-cluster-cluster-ca-cert"
+    caCertSecret: ""
   dataPersistence:
     enabled: false
     s3Endpoint: ""

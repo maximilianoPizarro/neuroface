@@ -64,7 +64,7 @@ spec:
             - name: data
               mountPath: /data
           {{- end }}
-          {{- if and .Values.ppe.enabled .Values.ppe.kafka.enabled }}
+          {{- if and .Values.ppe.enabled .Values.ppe.kafka.enabled .Values.ppe.kafka.caCertSecret }}
             - name: kafka-ca-cert
               mountPath: /etc/kafka-certs
               readOnly: true
@@ -77,7 +77,7 @@ spec:
           persistentVolumeClaim:
             claimName: {{ include "neuroface.fullname" . }}-data
       {{- end }}
-      {{- if and .Values.ppe.enabled .Values.ppe.kafka.enabled }}
+      {{- if and .Values.ppe.enabled .Values.ppe.kafka.enabled .Values.ppe.kafka.caCertSecret }}
         - name: kafka-ca-cert
           secret:
             secretName: {{ .Values.ppe.kafka.caCertSecret }}
