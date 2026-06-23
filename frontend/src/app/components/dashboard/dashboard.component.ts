@@ -44,8 +44,10 @@ interface DashboardCard {
       @for (card of cards; track card.link) {
         <div class="pf-v5-c-card rh-card">
           <div class="pf-v5-c-card__header">
-            <div class="pf-v5-c-card__title">{{ card.title }}</div>
-            <div class="pf-v5-c-card__subtitle">{{ card.subtitle }}</div>
+            <div class="pf-v5-c-card__header-main">
+              <div class="pf-v5-c-card__title pf-m-lg">{{ card.title }}</div>
+              <p class="card-subtitle">{{ card.subtitle }}</p>
+            </div>
           </div>
           <div class="pf-v5-c-card__footer">
             <a
@@ -73,6 +75,11 @@ interface DashboardCard {
     .pf-v5-c-card__footer {
       padding: var(--pf-v5-global--spacer--md, 1rem);
       padding-top: 0;
+    }
+    .card-subtitle {
+      font-size: 0.85rem;
+      color: var(--rh-gray-600);
+      margin: 0.25rem 0 0;
     }
     .rh-btn-primary {
       background-color: var(--rh-red) !important;
