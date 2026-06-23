@@ -97,7 +97,7 @@ import { MatListModule } from '@angular/material/list';
               <a href="https://maximilianopizarro.github.io/" target="_blank" rel="noopener" class="footer-author">
                 maximilianoPizarro
               </a>
-              <span class="footer-version">v1.3.0</span>
+              <span class="footer-version">v1.4.1</span>
             </div>
           </div>
         </footer>
