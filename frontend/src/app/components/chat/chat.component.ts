@@ -30,15 +30,14 @@ import { ChatMessage, ChatStatusResponse } from '../../models/interfaces';
   ],
   template: `
     <div class="chat-container">
-      <mat-card class="status-card">
-        <mat-card-header>
-          <mat-icon mat-card-avatar>smart_toy</mat-icon>
-          <mat-card-title>AI Face Analysis Chat</mat-card-title>
-          <mat-card-subtitle *ngIf="status">
+      <div class="pf-v5-c-card rh-card status-card">
+        <div class="pf-v5-c-card__header">
+          <div class="pf-v5-c-card__title">AI Face Analysis Chat</div>
+          <div class="pf-v5-c-card__subtitle" *ngIf="status">
             {{ status.enabled ? 'Connected to ' + (status.model_name || 'LLM') : 'Chat disabled' }}
-          </mat-card-subtitle>
-        </mat-card-header>
-      </mat-card>
+          </div>
+        </div>
+      </div>
 
       <div *ngIf="!status?.enabled" class="disabled-notice">
         <mat-icon>info</mat-icon>

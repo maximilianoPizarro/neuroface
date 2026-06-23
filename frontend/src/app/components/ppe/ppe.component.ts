@@ -30,7 +30,7 @@ const PPE_COLORS: Record<string, string> = {
     MatSlideToggleModule, MatChipsModule, MatProgressSpinnerModule, CameraComponent,
   ],
   template: `
-    <h2>PPE Safety Detection</h2>
+    <h1 class="pf-v5-c-title pf-m-2xl">PPE Safety Detection</h1>
     <p class="subtitle">YOLO v8 — Personal Protective Equipment Compliance</p>
 
     <div class="ppe-layout">
@@ -49,14 +49,14 @@ const PPE_COLORS: Record<string, string> = {
       </mat-card>
 
       <div class="status-panel">
-        <mat-card class="rh-card status-card" [ngClass]="statusClass">
-          <mat-card-header>
-            <mat-card-title>
+        <div class="pf-v5-c-card rh-card status-card" [ngClass]="statusClass">
+          <div class="pf-v5-c-card__header">
+            <div class="pf-v5-c-card__title">
               <span class="status-icon">{{ statusIcon }}</span>
               {{ statusLabel }}
-            </mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
+            </div>
+          </div>
+          <div class="pf-v5-c-card__body">
             <div class="status-details">
               <div class="detail-row">
                 <span class="detail-label">Persons</span>
@@ -85,8 +85,8 @@ const PPE_COLORS: Record<string, string> = {
                 {{ key }}: {{ lastResult.summary[key] }}
               </mat-chip>
             </div>
-          </mat-card-content>
-        </mat-card>
+          </div>
+        </div>
 
         <mat-card class="rh-card llm-card" *ngIf="lastResult?.llm_analysis">
           <mat-card-header>

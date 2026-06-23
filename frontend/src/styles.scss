@@ -1,19 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700&family=Red+Hat+Text:wght@400;500&display=swap');
 
 :root {
-  --rh-red: #EE0000;
-  --rh-red-dark: #A30000;
-  --rh-black: #151515;
-  --rh-gray-900: #212427;
-  --rh-gray-600: #4D5258;
-  --rh-gray-400: #8A8D90;
-  --rh-gray-200: #D2D2D2;
-  --rh-gray-100: #F0F0F0;
-  --rh-white: #FFFFFF;
-  --rh-blue: #0066CC;
-  --rh-blue-light: #73BCF7;
-  --rh-green: #3E8635;
-  --rh-orange: #F4C145;
+  --rh-red: var(--pf-v5-global--palette--red-100, #ee0000);
+  --rh-red-dark: var(--pf-v5-global--palette--red-200, #a30000);
+  --rh-black: var(--pf-v5-global--palette--black-1000, #151515);
+  --rh-gray-900: var(--pf-v5-global--palette--black-700, #212427);
+  --rh-gray-600: var(--pf-v5-global--palette--black-500, #4d5258);
+  --rh-gray-400: var(--pf-v5-global--palette--black-400, #8a8d90);
+  --rh-gray-200: var(--pf-v5-global--BorderColor--100, #d2d2d2);
+  --rh-gray-100: var(--pf-v5-global--BackgroundColor--200, #f0f0f0);
+  --rh-white: var(--pf-v5-global--BackgroundColor--100, #ffffff);
+  --rh-blue: var(--pf-v5-global--primary-color--100, #0066cc);
+  --rh-green: var(--pf-v5-global--success-color--100, #3e8635);
+  --rh-orange: var(--pf-v5-global--warning-color--100, #f4c145);
 }
 
 html, body {
@@ -80,8 +79,20 @@ h1, h2, h3, h4, h5, h6 {
 .card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 16px;
-  margin-top: 16px;
+  gap: var(--pf-v5-global--spacer--md, 1rem);
+  margin-top: var(--pf-v5-global--spacer--md, 1rem);
+}
+
+.rh-card,
+mat-card.rh-card {
+  border-top: 3px solid var(--rh-red);
+}
+
+.pf-v5-c-card.rh-card {
+  border-top: 3px solid var(--rh-red);
+  padding: var(--pf-v5-global--spacer--md, 1rem);
+  background: var(--pf-v5-global--BackgroundColor--100);
+  box-shadow: var(--pf-v5-global--BoxShadow--sm);
 }
 
 video, canvas {

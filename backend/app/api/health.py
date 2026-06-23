@@ -55,4 +55,15 @@ async def readiness():
             ppe_info["status"] = "unreachable"
         result["ppe_serving"] = ppe_info
 
+    if settings.chat_enabled and settings.chat_model_endpoint:
+        chat_info = {"endpoint": settings.chat_model_endpoint, "via_ai_gateway": "ai-gateway" in settings.chat_model_endpoint}
+        try:
+            async with httpx.AsyncClient(timeout=5.0, verify=False) as client:
+                resp = await client.get(f"{settings.chat_model_endpoint.rstrip('/')}/models")
+                chat_info["status"] = "connected" if resp.status_code < 500 else "error"
+                chat_info["http_status"] = resp.status_code
+        except Exception:
+            chat_info["status"] = "unreachable"
+        result["chat_backend"] = chat_info
+
     return result

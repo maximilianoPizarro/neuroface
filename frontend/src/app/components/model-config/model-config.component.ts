@@ -33,7 +33,7 @@ import { AvailableModel, DetectionMethod, ModelConfigResponse } from '../../mode
     <mat-spinner *ngIf="loading" diameter="32"></mat-spinner>
 
     <div class="card-grid" *ngIf="!loading">
-      <mat-card>
+      <mat-card class="pf-v5-c-card rh-card">
         <mat-card-header>
           <mat-card-title>Current Configuration</mat-card-title>
         </mat-card-header>
@@ -94,7 +94,7 @@ import { AvailableModel, DetectionMethod, ModelConfigResponse } from '../../mode
         </mat-card-content>
       </mat-card>
 
-      <mat-card>
+      <mat-card class="pf-v5-c-card rh-card">
         <mat-card-header>
           <mat-card-title>Face Detection Method</mat-card-title>
         </mat-card-header>
@@ -127,7 +127,7 @@ import { AvailableModel, DetectionMethod, ModelConfigResponse } from '../../mode
         </mat-card-actions>
       </mat-card>
 
-      <mat-card>
+      <mat-card class="pf-v5-c-card rh-card">
         <mat-card-header>
           <mat-card-title>Recognition Model</mat-card-title>
         </mat-card-header>

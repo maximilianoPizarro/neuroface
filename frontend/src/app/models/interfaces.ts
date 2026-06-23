@@ -29,6 +29,7 @@ export interface ReadyResponse {
   ovms_status?: string;
   detection_method?: string;
   object_detection?: boolean;
+  ppe_enabled?: boolean;
 }
 
 export interface ModelInfo {

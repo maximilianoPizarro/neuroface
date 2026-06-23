@@ -40,16 +40,21 @@ def _get_producer():
     try:
         from confluent_kafka import Producer
 
-        conf = {
-            "bootstrap.servers": settings.ppe_kafka_bootstrap,
-            "security.protocol": "SASL_SSL",
-            "sasl.mechanism": "SCRAM-SHA-512",
-            "sasl.username": settings.ppe_kafka_user,
-            "sasl.password": settings.ppe_kafka_password,
-        }
-        ca = settings.ppe_kafka_ca_cert
-        if ca and os.path.isfile(ca):
-            conf["ssl.ca.location"] = ca
+        conf: dict = {"bootstrap.servers": settings.ppe_kafka_bootstrap}
+        if settings.ppe_kafka_user and settings.ppe_kafka_password:
+            conf.update(
+                {
+                    "security.protocol": "SASL_SSL",
+                    "sasl.mechanism": "SCRAM-SHA-512",
+                    "sasl.username": settings.ppe_kafka_user,
+                    "sasl.password": settings.ppe_kafka_password,
+                }
+            )
+            ca = settings.ppe_kafka_ca_cert
+            if ca and os.path.isfile(ca):
+                conf["ssl.ca.location"] = ca
+        else:
+            conf["security.protocol"] = "PLAINTEXT"
         _producer = Producer(conf)
         log.info("Kafka producer initialised -> %s", settings.ppe_kafka_topic)
         return _producer

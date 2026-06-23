@@ -1,233 +1,125 @@
 import { Component } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatListModule } from '@angular/material/list';
+
+interface NavItem {
+  path: string;
+  label: string;
+  icon: string;
+}
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [
-    RouterOutlet,
-    RouterLink,
-    RouterLinkActive,
-    MatToolbarModule,
-    MatButtonModule,
-    MatIconModule,
-    MatSidenavModule,
-    MatListModule,
-  ],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive],
   template: `
-    <mat-toolbar class="app-toolbar">
-      <button mat-icon-button (click)="sidenav.toggle()">
-        <mat-icon>menu</mat-icon>
-      </button>
-      <img src="assets/icons/icon.svg" alt="NeuroFace" class="toolbar-logo">
-      <span class="app-title">NeuroFace</span>
-      <span class="spacer"></span>
-      <span class="app-subtitle">Facial Recognition &amp; PPE Safety Detection</span>
-    </mat-toolbar>
-
-    <mat-sidenav-container class="sidenav-container">
-      <mat-sidenav #sidenav mode="side" opened class="sidenav">
-        <mat-nav-list>
-          <a mat-list-item routerLink="/dashboard" routerLinkActive="active-link">
-            <mat-icon matListItemIcon>dashboard</mat-icon>
-            <span matListItemTitle>Dashboard</span>
-          </a>
-          <a mat-list-item routerLink="/recognition" routerLinkActive="active-link">
-            <mat-icon matListItemIcon>face</mat-icon>
-            <span matListItemTitle>Recognition</span>
-          </a>
-          <a mat-list-item routerLink="/training" routerLinkActive="active-link">
-            <mat-icon matListItemIcon>model_training</mat-icon>
-            <span matListItemTitle>Training</span>
-          </a>
-          <a mat-list-item routerLink="/labels" routerLinkActive="active-link">
-            <mat-icon matListItemIcon>people</mat-icon>
-            <span matListItemTitle>Labels</span>
-          </a>
-          <a mat-list-item routerLink="/objects" routerLinkActive="active-link">
-            <mat-icon matListItemIcon>category</mat-icon>
-            <span matListItemTitle>Object Detection</span>
-          </a>
-          <a mat-list-item routerLink="/ppe" routerLinkActive="active-link">
-            <mat-icon matListItemIcon>health_and_safety</mat-icon>
-            <span matListItemTitle>PPE Safety</span>
-          </a>
-          <a mat-list-item routerLink="/model-config" routerLinkActive="active-link">
-            <mat-icon matListItemIcon>settings</mat-icon>
-            <span matListItemTitle>Model Config</span>
-          </a>
-          <a mat-list-item routerLink="/chat" routerLinkActive="active-link">
-            <mat-icon matListItemIcon>smart_toy</mat-icon>
-            <span matListItemTitle>AI Chat</span>
-          </a>
-        </mat-nav-list>
-
-        <div class="sidenav-bottom">
-          <a href="https://maximilianopizarro.github.io/neuroface/" target="_blank" rel="noopener" class="docs-link">
-            <mat-icon>menu_book</mat-icon>
-            <span>Documentation</span>
+    <div class="pf-v5-c-page">
+      <header class="pf-v5-c-masthead app-masthead" role="banner">
+        <div class="pf-v5-c-masthead__main">
+          <button class="pf-v5-c-masthead__toggle" type="button" aria-label="Toggle navigation" (click)="navOpen = !navOpen">
+            <i class="fas fa-bars" aria-hidden="true"></i>
+          </button>
+          <a class="pf-v5-c-masthead__brand" routerLink="/dashboard">
+            <img src="assets/icons/icon.svg" alt="" class="toolbar-logo" />
+            <span class="pf-v5-c-masthead__brand-text">NeuroFace</span>
           </a>
         </div>
-      </mat-sidenav>
+        <div class="pf-v5-c-masthead__content">
+          <span class="app-subtitle">AI Computer Vision at the Edge</span>
+        </div>
+      </header>
 
-      <mat-sidenav-content class="main-content">
-        <div class="container">
-          <router-outlet />
+      <div class="pf-v5-c-page" [class.nav-collapsed]="!navOpen">
+        <div class="pf-v5-c-page__sidebar pf-m-hidden pf-m-visible-on-lg" [class.pf-m-expanded]="navOpen">
+          <nav class="pf-v5-c-nav" aria-label="Global">
+            <ul class="pf-v5-c-nav__list">
+              @for (item of navItems; track item.path) {
+                <li class="pf-v5-c-nav__item">
+                  <a
+                    class="pf-v5-c-nav__link"
+                    [routerLink]="item.path"
+                    routerLinkActive="pf-m-current"
+                  >{{ item.label }}</a>
+                </li>
+              }
+            </ul>
+          </nav>
+          <div class="sidenav-bottom">
+            <a href="https://maximilianopizarro.github.io/neuroface/" target="_blank" rel="noopener" class="docs-link">
+              Documentation
+            </a>
+          </div>
         </div>
 
-        <footer class="app-footer">
-          <div class="footer-content">
-            <div class="footer-powered">
-              <span>Powered by</span>
-              <svg class="footer-rh-icon" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                <rect width="32" height="32" rx="4" fill="#EE0000"/>
-                <text x="16" y="22" text-anchor="middle" fill="#fff" font-size="18" font-weight="bold" font-family="sans-serif">RH</text>
-              </svg>
-              <strong>OpenShift</strong>
-              <span>&amp;</span>
-              <strong>OpenShift AI</strong>
-            </div>
-            <div class="footer-meta">
-              <span class="experimental-badge">Experimental</span>
-              <a href="https://maximilianopizarro.github.io/" target="_blank" rel="noopener" class="footer-author">
-                maximilianoPizarro
-              </a>
-              <span class="footer-version">v1.4.1</span>
+        <main class="pf-v5-c-page__main" tabindex="-1">
+          <div class="pf-v5-c-page__main-section">
+            <div class="pf-v5-l-gallery pf-m-gutter container">
+              <router-outlet />
             </div>
           </div>
-        </footer>
-      </mat-sidenav-content>
-    </mat-sidenav-container>
+          <footer class="app-footer pf-v5-c-page__main-section pf-m-limit-width">
+            <div class="footer-content">
+              <div class="footer-powered">
+                <span>Powered by</span>
+                <strong>OpenShift</strong>
+                <span>&amp;</span>
+                <strong>OpenShift AI</strong>
+              </div>
+              <div class="footer-meta">
+                <span class="pf-v5-c-label pf-m-red experimental-badge">Experimental</span>
+                <a href="https://maximilianopizarro.github.io/" target="_blank" rel="noopener" class="footer-author">
+                  maximilianoPizarro
+                </a>
+                <span class="footer-version">v1.5.0</span>
+              </div>
+            </div>
+          </footer>
+        </main>
+      </div>
+    </div>
   `,
   styles: [`
-    .app-toolbar {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      background: var(--rh-black) !important;
-      color: var(--rh-white) !important;
-      border-bottom: 3px solid var(--rh-red);
+    .app-masthead {
+      background: var(--pf-v5-global--palette--black-1000, #151515);
+      color: var(--pf-v5-global--Color--light-100);
+      border-bottom: 3px solid var(--pf-v5-global--palette--red-100, #ee0000);
     }
-    .toolbar-logo {
-      height: 30px;
-      width: 30px;
-      margin-left: 8px;
-      border-radius: 6px;
+    .pf-v5-c-masthead__brand-text { color: inherit; font-weight: 600; }
+    .toolbar-logo { height: 28px; width: 28px; margin-right: 8px; border-radius: 4px; }
+    .app-subtitle { font-size: 0.875rem; opacity: 0.85; padding-right: 1rem; }
+    .pf-v5-c-page__sidebar {
+      background: var(--pf-v5-global--BackgroundColor--100);
+      min-width: 220px;
+      border-right: 1px solid var(--pf-v5-global--BorderColor--100);
     }
-    .app-title {
-      font-family: 'Red Hat Display', sans-serif;
-      font-weight: 700;
-      margin-left: 8px;
-      font-size: 20px;
-      letter-spacing: -0.3px;
-    }
-    .app-subtitle {
-      font-size: 13px;
-      opacity: 0.7;
-      font-family: 'Red Hat Text', sans-serif;
-    }
-    .sidenav-container {
-      height: calc(100vh - 67px);
-    }
-    .sidenav {
-      width: 220px;
-      background: var(--rh-white);
-      border-right: 1px solid var(--rh-gray-200);
-      display: flex;
-      flex-direction: column;
-    }
-    mat-nav-list {
-      flex: 1;
-    }
-    .active-link {
-      background-color: rgba(238, 0, 0, 0.06) !important;
-      border-left: 3px solid var(--rh-red);
-    }
-    .sidenav-bottom {
-      padding: 12px 16px;
-      border-top: 1px solid var(--rh-gray-200);
-    }
-    .docs-link {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--rh-blue);
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 500;
-      padding: 4px 0;
-    }
-    .docs-link mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-      color: var(--rh-gray-600);
-    }
-    .docs-link:hover {
-      text-decoration: underline;
-    }
-    .main-content {
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      min-height: 100%;
-    }
-    .container {
-      flex: 1;
-    }
+    .sidenav-bottom { padding: 1rem; border-top: 1px solid var(--pf-v5-global--BorderColor--100); }
+    .docs-link { color: var(--pf-v5-global--link--Color); text-decoration: none; font-size: 0.875rem; }
     .app-footer {
-      background: var(--rh-gray-900);
-      color: var(--rh-gray-200);
-      padding: 14px 24px;
-      margin-top: auto;
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--pf-v5-global--BorderColor--100);
+      color: var(--pf-v5-global--Color--200);
+      font-size: 0.8125rem;
     }
-    .footer-content {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      max-width: 1200px;
-      margin: 0 auto;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .footer-powered {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-    }
-    .footer-powered strong {
-      color: var(--rh-white);
-    }
-    .footer-rh-icon {
-      height: 18px;
-      width: 18px;
-    }
-    .footer-meta {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .footer-author {
-      color: var(--rh-blue-light);
-      text-decoration: none;
-      font-size: 12px;
-      font-weight: 500;
-    }
-    .footer-author:hover {
-      text-decoration: underline;
-      color: var(--rh-white);
-    }
-    .footer-version {
-      font-size: 12px;
-      opacity: 0.6;
-      font-family: monospace;
+    .footer-content { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; }
+    .footer-powered { display: flex; align-items: center; gap: 0.35rem; }
+    .footer-meta { display: flex; align-items: center; gap: 0.75rem; }
+    .experimental-badge { font-size: 0.75rem; }
+    @media (max-width: 992px) {
+      .pf-v5-c-page__sidebar { display: none; }
+      .pf-v5-c-page__sidebar.pf-m-expanded { display: block; position: absolute; z-index: 200; height: 100%; }
     }
   `],
 })
-export class AppComponent {}
+export class AppComponent {
+  navOpen = true;
+  navItems: NavItem[] = [
+    { path: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
+    { path: '/recognition', label: 'Recognition', icon: 'face' },
+    { path: '/training', label: 'Training', icon: 'model_training' },
+    { path: '/labels', label: 'Labels', icon: 'people' },
+    { path: '/objects', label: 'Object Detection', icon: 'category' },
+    { path: '/ppe', label: 'PPE Safety', icon: 'health_and_safety' },
+    { path: '/model-config', label: 'Model Config', icon: 'settings' },
+    { path: '/chat', label: 'AI Chat', icon: 'smart_toy' },
+  ];
+}

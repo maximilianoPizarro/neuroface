@@ -1,3 +1,4 @@
+import os
 import logging
 from contextlib import asynccontextmanager
 from typing import Optional
@@ -73,3 +74,38 @@ app.include_router(analysis.router)
 app.include_router(chat.router)
 app.include_router(objects.router)
 app.include_router(ppe.router)
+
+
+def _setup_otel():
+    endpoint = os.environ.get(
+        "OTEL_EXPORTER_OTLP_ENDPOINT",
+        "http://cluster-collector.openshift-cluster-observability-operator.svc:4317",
+    )
+    if os.environ.get("OTEL_SDK_DISABLED", "").lower() in ("1", "true", "yes"):
+        return
+    try:
+        from opentelemetry import trace
+        from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+        from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+        from opentelemetry.sdk.resources import Resource
+        from opentelemetry.sdk.trace import TracerProvider
+        from opentelemetry.sdk.trace.export import BatchSpanProcessor
+
+        resource = Resource.create(
+            {
+                "service.name": os.environ.get("OTEL_SERVICE_NAME", "neuroface-backend"),
+                "service.version": settings.app_version,
+            }
+        )
+        provider = TracerProvider(resource=resource)
+        insecure = endpoint.startswith("http://")
+        exporter = OTLPSpanExporter(endpoint=endpoint.replace("http://", "").replace("https://", ""), insecure=insecure)
+        provider.add_span_processor(BatchSpanProcessor(exporter))
+        trace.set_tracer_provider(provider)
+        FastAPIInstrumentor.instrument_app(app)
+        logger.info("OpenTelemetry instrumentation enabled (endpoint=%s)", endpoint)
+    except Exception as exc:
+        logger.warning("OpenTelemetry setup skipped: %s", exc)
+
+
+_setup_otel()
