@@ -158,7 +158,7 @@ async def ppe_detect(req: PpeDetectRequest):
     detections = result.get("detections", [])
     expected = [c.strip() for c in settings.ppe_classes.split(",")]
     detected_classes = {d["class_name"].lower() for d in detections}
-    person_count = sum(1 for d in detections if d["class_name"] == "person")
+    person_count = sum(1 for d in detections if d["class_name"].lower() == "person")
     present_ppe = [c for c in expected if c.lower() in detected_classes]
     missing_ppe = [c for c in expected if c.lower() not in detected_classes]
 
