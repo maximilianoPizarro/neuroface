@@ -36,4 +36,23 @@ async def readiness():
         except Exception:
             result["ovms_status"] = "unreachable"
 
+    if settings.ppe_enabled and settings.ppe_endpoint:
+        ppe_info = {"endpoint": settings.ppe_endpoint, "status": "unknown"}
+        try:
+            async with httpx.AsyncClient(timeout=5.0, verify=False) as client:
+                resp = await client.get(f"{settings.ppe_endpoint}/health")
+                if resp.status_code == 200:
+                    health = resp.json()
+                    ppe_info["status"] = "connected"
+                    ppe_info["model_name"] = health.get("model_name", health.get("model", ""))
+                    ppe_info["model_loaded"] = health.get("model_loaded", True)
+                    ppe_info["classes"] = health.get("classes", [])
+                    v2 = await client.get(f"{settings.ppe_endpoint}/v2/models/yolo-ppe/ready")
+                    ppe_info["kserve_v2"] = v2.status_code == 200
+                else:
+                    ppe_info["status"] = "error"
+        except Exception:
+            ppe_info["status"] = "unreachable"
+        result["ppe_serving"] = ppe_info
+
     return result

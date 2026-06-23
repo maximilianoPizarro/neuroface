@@ -67,6 +67,33 @@ import { AvailableModel, DetectionMethod, ModelConfigResponse } from '../../mode
         </mat-card-content>
       </mat-card>
 
+      <mat-card *ngIf="ppeServing">
+        <mat-card-header>
+          <mat-card-title>KServe PPE Serving</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="config-section">
+            <p>
+              <strong>Status:</strong>
+              <mat-chip [class]="ppeServing.status === 'connected' ? 'available-chip' : 'unavailable-chip'">
+                {{ ppeServing.status === 'connected' ? 'Connected' : ppeServing.status }}
+              </mat-chip>
+            </p>
+            <div class="ovms-details" *ngIf="ppeServing.status === 'connected'">
+              <p><strong>Model:</strong> {{ ppeServing.model_name }}</p>
+              <p><strong>Endpoint:</strong> {{ ppeServing.endpoint }}</p>
+              <p><strong>Classes:</strong> {{ ppeServing.classes?.length || 0 }} ({{ ppeServing.classes?.join(', ') }})</p>
+              <p>
+                <strong>KServe v2:</strong>
+                <mat-chip [class]="ppeServing.kserve_v2 ? 'available-chip' : 'unavailable-chip'" style="font-size:11px">
+                  {{ ppeServing.kserve_v2 ? 'Ready' : 'Not available' }}
+                </mat-chip>
+              </p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
       <mat-card>
         <mat-card-header>
           <mat-card-title>Face Detection Method</mat-card-title>
@@ -164,6 +191,7 @@ export class ModelConfigComponent implements OnInit {
   config: ModelConfigResponse | null = null;
   availableModels: AvailableModel[] = [];
   detectionMethods: DetectionMethod[] = [];
+  ppeServing: any = null;
   selectedModel = '';
   selectedDetection = '';
   loading = true;
@@ -183,6 +211,9 @@ export class ModelConfigComponent implements OnInit {
         this.config = cfg;
         this.selectedModel = cfg.ai_model;
         this.selectedDetection = cfg.detection_method;
+        this.api.ready().subscribe({
+          next: (r: any) => { this.ppeServing = r.ppe_serving || null; },
+        });
         this.api.getAvailableModels().subscribe({
           next: (res) => {
             this.availableModels = res.models;
