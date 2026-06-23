@@ -19,11 +19,11 @@ entries:
           url: https://github.com/maximilianoPizarro/neuroface
     apiVersion: v2
     appVersion: 1.4.1
-    created: "2026-06-23T17:06:22.833726575Z"
+    created: "2026-06-23T17:15:05.97552625Z"
     description: Facial Recognition Webapp with ML and PPE Safety Detection - FastAPI
       backend + Angular frontend on Red Hat UBI9 with OpenVINO Model Server + YOLO
       PPE
-    digest: 4eac9756c640b8c5ec507621b74940fd911edfe7bb9e1c65805f8d064f8db4e8
+    digest: 66b78822e00640f4c738ee67aa2e929c71e75abd5a118be28b741476e57d1665
     home: https://github.com/maximilianoPizarro/neuroface
     icon: https://raw.githubusercontent.com/maximilianoPizarro/neuroface/main/docs/icon.svg
     keywords:
@@ -65,7 +65,7 @@ entries:
           url: https://github.com/maximilianoPizarro/neuroface
     apiVersion: v2
     appVersion: 1.4.0
-    created: "2026-06-23T17:06:22.832789658Z"
+    created: "2026-06-23T17:15:05.974210602Z"
     description: Facial Recognition Webapp with ML and PPE Safety Detection - FastAPI
       backend + Angular frontend on Red Hat UBI9 with OpenVINO Model Server + YOLO
       PPE
@@ -109,7 +109,7 @@ entries:
           url: https://github.com/maximilianoPizarro/neuroface
     apiVersion: v2
     appVersion: 1.3.0
-    created: "2026-06-23T17:06:22.83187859Z"
+    created: "2026-06-23T17:15:05.972673912Z"
     description: Facial Recognition Webapp with ML and PPE Safety Detection - FastAPI
       backend + Angular frontend on Red Hat UBI9 with OpenVINO Model Server + YOLO
       PPE
@@ -152,7 +152,7 @@ entries:
           url: https://github.com/maximilianoPizarro/neuroface
     apiVersion: v2
     appVersion: 1.2.0
-    created: "2026-06-23T17:06:22.831063221Z"
+    created: "2026-06-23T17:15:05.971834918Z"
     description: Facial Recognition Webapp with ML - FastAPI backend + Angular frontend
       on Red Hat UBI9 with OpenVINO Model Server
     digest: ade27647550bd83172d391475b111ba230e69982d35c089dfedee5bd8050428d
@@ -194,7 +194,7 @@ entries:
           url: https://github.com/maximilianoPizarro/neuroface
     apiVersion: v2
     appVersion: 1.2.0
-    created: "2026-06-23T17:06:22.830215751Z"
+    created: "2026-06-23T17:15:05.971097476Z"
     description: Facial Recognition Webapp with ML - FastAPI backend + Angular frontend
       on Red Hat UBI9 with OpenVINO Model Server
     digest: f1213041acf4e721f5d2e4792b6ba48925c6fe9cf7a994649ebd4917cf2bc77e
@@ -236,7 +236,7 @@ entries:
           url: https://github.com/maximilianoPizarro/neuroface
     apiVersion: v2
     appVersion: 1.1.1
-    created: "2026-06-23T17:06:22.82945253Z"
+    created: "2026-06-23T17:15:05.97040019Z"
     description: Facial Recognition Webapp with ML - FastAPI backend + Angular frontend
       on Red Hat UBI9 with OpenVINO Model Server
     digest: 9aee9ccfdb17a164a6b99a8669abf7caa9ac2dc9b7199cd4d4f52c941c262e2e
@@ -278,7 +278,7 @@ entries:
           url: https://github.com/maximilianoPizarro/neuroface
     apiVersion: v2
     appVersion: 1.1.0
-    created: "2026-06-23T17:06:22.827912372Z"
+    created: "2026-06-23T17:15:05.969694127Z"
     description: Facial Recognition Webapp with ML - FastAPI backend + Angular frontend
       on Red Hat UBI9 with OpenVINO Model Server
     digest: cacb7ce1237c1a4c9685deeac3b6b2e384cae5054bed1c89b76baaecda744fa9
@@ -316,7 +316,7 @@ entries:
           url: https://github.com/maximilianoPizarro/neuroface
     apiVersion: v2
     appVersion: 1.0.1
-    created: "2026-06-23T17:06:22.826875497Z"
+    created: "2026-06-23T17:15:05.969008984Z"
     description: Facial Recognition Webapp with ML - FastAPI backend + Angular frontend
       on Red Hat UBI9
     digest: 35fa25e62eae7464d9fa262d6865710a9490bc3f7316db09ec695b759f29203a
@@ -351,7 +351,7 @@ entries:
           url: https://github.com/maximilianoPizarro/neuroface
     apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-06-23T17:06:22.826400707Z"
+    created: "2026-06-23T17:15:05.968500515Z"
     description: Facial Recognition Webapp with ML — FastAPI backend + Angular frontend
       on Red Hat UBI9
     digest: 4d3eeae1b0cecdf9620cbbb2f0fed7ef9e71bf0aa4bf0816d9c69e553cad7926
@@ -374,4 +374,4 @@ entries:
     urls:
     - https://maximilianopizarro.github.io/neuroface/neuroface-1.0.0.tgz
     version: 1.0.0
-generated: "2026-06-23T17:06:22.82575164Z"
+generated: "2026-06-23T17:15:05.967983669Z"
