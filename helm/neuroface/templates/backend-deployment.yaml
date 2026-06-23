@@ -37,7 +37,7 @@ spec:
                   name: {{ include "neuroface.fullname" . }}-chat-token
                   key: token
           {{- end }}
-          {{- if and .Values.ppe.enabled .Values.ppe.kafka.enabled }}
+          {{- if and .Values.ppe.enabled .Values.ppe.kafka.enabled .Values.ppe.kafka.secretName }}
             - name: NEUROFACE_PPE_KAFKA_PASSWORD
               valueFrom:
                 secretKeyRef:

@@ -131,7 +131,7 @@ ppe:
     bootstrap: ""
     user: ""
     topic: "cv.ppe.detections"
-    secretName: "cdc-user"
+    secretName: ""
     caCertSecret: ""
   dataPersistence:
     enabled: false
