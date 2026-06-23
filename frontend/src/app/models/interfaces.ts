@@ -22,6 +22,7 @@ export interface HealthResponse {
 
 export interface ReadyResponse {
   status: string;
+  cluster?: string;
   model_loaded: boolean;
   ai_model: string;
   chat_enabled: boolean;

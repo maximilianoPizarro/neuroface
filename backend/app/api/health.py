@@ -8,7 +8,12 @@ router = APIRouter(tags=["health"])
 
 @router.get("/health")
 async def liveness():
-    return {"status": "ok", "app": settings.app_name, "version": settings.app_version}
+    return {
+        "status": "ok",
+        "app": settings.app_name,
+        "version": settings.app_version,
+        "cluster": settings.cluster_name,
+    }
 
 
 @router.get("/ready")
@@ -17,6 +22,7 @@ async def readiness():
 
     result = {
         "status": "ok",
+        "cluster": settings.cluster_name,
         "model_loaded": face_engine.is_trained,
         "ai_model": settings.ai_model,
         "detection_method": settings.detection_method,
@@ -47,6 +53,8 @@ async def readiness():
                     ppe_info["model_name"] = health.get("model_name", health.get("model", ""))
                     ppe_info["model_loaded"] = health.get("model_loaded", True)
                     ppe_info["classes"] = health.get("classes", [])
+                    if health.get("cluster"):
+                        ppe_info["cluster"] = health["cluster"]
                     v2 = await client.get(f"{settings.ppe_endpoint}/v2/models/yolo-ppe/ready")
                     ppe_info["kserve_v2"] = v2.status_code == 200
                 else:

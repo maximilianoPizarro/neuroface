@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { ApiService } from './services/api.service';
 
 interface NavItem {
   path: string;
@@ -12,7 +13,7 @@ interface NavItem {
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive],
   template: `
-    <div class="pf-v5-c-page">
+    <div class="app-shell">
       <header class="pf-v5-c-masthead app-masthead" role="banner">
         <div class="pf-v5-c-masthead__main">
           <button class="pf-v5-c-masthead__toggle" type="button" aria-label="Toggle navigation" (click)="navOpen = !navOpen">
@@ -24,13 +25,16 @@ interface NavItem {
           </a>
         </div>
         <div class="pf-v5-c-masthead__content">
+          @if (cluster) {
+            <span class="cluster-badge" [class]="clusterClass()">{{ cluster }}</span>
+          }
           <span class="app-subtitle">AI Computer Vision at the Edge</span>
         </div>
       </header>
 
       <div class="app-body" [class.nav-collapsed]="!navOpen">
-        <div class="pf-v5-c-page__sidebar pf-m-hidden pf-m-visible-on-lg" [class.pf-m-expanded]="navOpen">
-          <nav class="pf-v5-c-nav" aria-label="Global">
+        <aside class="app-sidebar" [class.pf-m-expanded]="navOpen">
+          <nav class="pf-v5-c-nav app-nav" aria-label="Global">
             <ul class="pf-v5-c-nav__list">
               @for (item of navItems; track item.path) {
                 <li class="pf-v5-c-nav__item">
@@ -48,15 +52,15 @@ interface NavItem {
               Documentation
             </a>
           </div>
-        </div>
+        </aside>
 
-        <main class="pf-v5-c-page__main" tabindex="-1">
-          <div class="pf-v5-c-page__main-section">
+        <main class="app-main" tabindex="-1">
+          <div class="app-main-section">
             <div class="container">
               <router-outlet />
             </div>
           </div>
-          <footer class="app-footer pf-v5-c-page__main-section pf-m-limit-width">
+          <footer class="app-footer">
             <div class="footer-content">
               <div class="footer-powered">
                 <span>Powered by</span>
@@ -69,7 +73,7 @@ interface NavItem {
                 <a href="https://maximilianopizarro.github.io/" target="_blank" rel="noopener" class="footer-author">
                   maximilianoPizarro
                 </a>
-                <span class="footer-version">v1.5.0</span>
+                <span class="footer-version">v1.5.1</span>
               </div>
             </div>
           </footer>
@@ -78,6 +82,12 @@ interface NavItem {
     </div>
   `,
   styles: [`
+    .app-shell {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      width: 100%;
+    }
     .app-masthead {
       background: var(--pf-v5-global--palette--black-1000, #151515);
       color: var(--pf-v5-global--Color--light-100);
@@ -86,28 +96,60 @@ interface NavItem {
       align-items: center;
       padding: 0 1rem;
       height: 56px;
+      width: 100%;
+      flex-shrink: 0;
     }
     .pf-v5-c-masthead__main { display: flex; align-items: center; gap: 0.5rem; }
     .pf-v5-c-masthead__brand { display: flex; align-items: center; text-decoration: none; color: inherit; }
     .pf-v5-c-masthead__brand-text { color: inherit; font-weight: 600; font-size: 1.1rem; }
     .toolbar-logo { height: 28px; width: 28px; margin-right: 8px; border-radius: 4px; }
     .pf-v5-c-masthead__toggle { background: none; border: none; color: inherit; font-size: 1.2rem; cursor: pointer; margin-right: 0.5rem; }
-    .pf-v5-c-masthead__content { margin-left: auto; }
-    .app-subtitle { font-size: 0.875rem; opacity: 0.85; padding-right: 1rem; }
+    .pf-v5-c-masthead__content {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .app-subtitle { font-size: 0.875rem; opacity: 0.85; }
+    .cluster-badge {
+      display: inline-block;
+      padding: 0.15rem 0.6rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: #fff;
+    }
+    .cluster-hub { background: #0066cc; }
+    .cluster-east { background: #3e8635; }
+    .cluster-west { background: #f0ab00; color: #151515; }
     .app-body {
       display: flex;
-      height: calc(100vh - 56px);
+      flex: 1;
+      min-height: 0;
+      width: 100%;
     }
-    .pf-v5-c-page__sidebar {
+    .app-sidebar {
       background: var(--pf-v5-global--BackgroundColor--100);
       width: 220px;
       min-width: 220px;
       border-right: 1px solid var(--pf-v5-global--BorderColor--100);
       display: flex;
       flex-direction: column;
-      overflow-y: auto;
+      overflow: hidden;
+      flex-shrink: 0;
     }
-    .pf-v5-c-nav__list { list-style: none; margin: 0; padding: 0.5rem 0; }
+    .app-nav {
+      flex: 1;
+      overflow-y: auto;
+      min-height: 0;
+    }
+    .pf-v5-c-nav__list {
+      list-style: none;
+      margin: 0;
+      padding: 0.5rem 0 2rem;
+    }
     .pf-v5-c-nav__item { margin: 0; }
     .pf-v5-c-nav__link {
       display: block;
@@ -123,32 +165,48 @@ interface NavItem {
       font-weight: 600;
       background: rgba(238, 0, 0, 0.06);
     }
-    .sidenav-bottom { margin-top: auto; padding: 1rem; border-top: 1px solid var(--pf-v5-global--BorderColor--100); }
+    .sidenav-bottom {
+      flex-shrink: 0;
+      padding: 1rem;
+      border-top: 1px solid var(--pf-v5-global--BorderColor--100);
+    }
     .docs-link { color: var(--pf-v5-global--link--Color); text-decoration: none; font-size: 0.875rem; }
-    .pf-v5-c-page__main {
+    .app-main {
       flex: 1;
+      min-width: 0;
+      width: 100%;
       overflow-y: auto;
       background: var(--pf-v5-global--BackgroundColor--200, #f0f0f0);
+      display: flex;
+      flex-direction: column;
     }
+    .app-main-section { flex: 1; }
     .app-footer {
       margin-top: 2rem;
-      padding-top: 1rem;
+      padding: 1rem 16px;
       border-top: 1px solid var(--pf-v5-global--BorderColor--100);
       color: var(--pf-v5-global--Color--200);
       font-size: 0.8125rem;
     }
-    .footer-content { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; }
+    .footer-content { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; max-width: 1200px; margin: 0 auto; }
     .footer-powered { display: flex; align-items: center; gap: 0.35rem; }
     .footer-meta { display: flex; align-items: center; gap: 0.75rem; }
     .experimental-badge { font-size: 0.75rem; }
     @media (max-width: 992px) {
-      .pf-v5-c-page__sidebar { display: none; }
-      .pf-v5-c-page__sidebar.pf-m-expanded { display: flex; position: absolute; z-index: 200; height: calc(100vh - 56px); box-shadow: 2px 0 8px rgba(0,0,0,0.15); }
+      .app-sidebar { display: none; }
+      .app-sidebar.pf-m-expanded {
+        display: flex;
+        position: absolute;
+        z-index: 200;
+        height: calc(100vh - 56px);
+        box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+      }
     }
   `],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   navOpen = true;
+  cluster = '';
   navItems: NavItem[] = [
     { path: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
     { path: '/recognition', label: 'Recognition', icon: 'face' },
@@ -159,4 +217,20 @@ export class AppComponent {
     { path: '/model-config', label: 'Model Config', icon: 'settings' },
     { path: '/chat', label: 'AI Chat', icon: 'smart_toy' },
   ];
+
+  constructor(private api: ApiService) {}
+
+  ngOnInit(): void {
+    this.api.ready().subscribe({
+      next: (r) => { this.cluster = r.cluster || 'hub'; },
+      error: () => { this.cluster = 'hub'; },
+    });
+  }
+
+  clusterClass(): string {
+    const c = this.cluster.toLowerCase();
+    if (c === 'east') return 'cluster-east';
+    if (c === 'west') return 'cluster-west';
+    return 'cluster-hub';
+  }
 }

@@ -1,3 +1,5 @@
+clusterName: hub
+
 backend:
   image:
     repository: quay.io/maximilianopizarro/neuroface-backend

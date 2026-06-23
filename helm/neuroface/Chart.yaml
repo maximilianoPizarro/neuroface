@@ -2,8 +2,8 @@ apiVersion: v2
 name: neuroface
 description: Facial Recognition Webapp with ML and PPE Safety Detection - FastAPI backend + Angular frontend on Red Hat UBI9 with OpenVINO Model Server + YOLO PPE
 type: application
-version: 1.4.1
-appVersion: "1.4.1"
+version: 1.4.2
+appVersion: "1.5.1"
 maintainers:
   - name: maximilianoPizarro
     url: https://github.com/maximilianoPizarro

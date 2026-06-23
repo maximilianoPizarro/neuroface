@@ -26,8 +26,12 @@ log = logging.getLogger("ppe-serving")
 MODEL_PATH = os.environ.get("MODEL_PATH", "/mnt/models/best.pt")
 MODEL_NAME = os.environ.get("MODEL_NAME", "yolo-ppe")
 CONFIDENCE = float(os.environ.get("CONFIDENCE", "0.5"))
+CLUSTER_NAME = os.environ.get(
+    "CLUSTER_NAME",
+    os.environ.get("NEUROFACE_CLUSTER_NAME", "unknown"),
+)
 
-app = FastAPI(title="YOLO PPE Serving", version="1.4.1")
+app = FastAPI(title="YOLO PPE Serving", version="1.5.1")
 
 _model = None
 _model_ready = False
@@ -92,6 +96,7 @@ def _run_inference(img: np.ndarray, conf: float) -> list[dict]:
 async def health():
     return {
         "status": "ok",
+        "cluster": CLUSTER_NAME,
         "model_name": MODEL_NAME,
         "model_path": MODEL_PATH,
         "model_loaded": _model_ready,

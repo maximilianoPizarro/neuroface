@@ -30,6 +30,8 @@ spec:
             - configMapRef:
                 name: {{ include "neuroface.fullname" . }}-config
           env:
+            - name: NEUROFACE_CLUSTER_NAME
+              value: {{ .Values.clusterName | default "hub" | quote }}
           {{- if and .Values.chat.enabled .Values.chat.autoServiceAccount }}
             - name: NEUROFACE_CHAT_API_KEY
               valueFrom:
