@@ -134,8 +134,10 @@ async def ppe_detect(req: PpeDetectRequest):
         raise HTTPException(status_code=400, detail=f"Invalid image data: {e}")
 
     import cv2
+    h, w = img.shape[:2]
     _, buf = cv2.imencode(".jpg", img)
     img_bytes = buf.tobytes()
+    log.info("PPE detect: image %dx%d (%d bytes JPEG), conf=%s", w, h, len(img_bytes), req.confidence or settings.ppe_confidence)
 
     client = _get_client()
     conf = req.confidence or settings.ppe_confidence
@@ -156,6 +158,7 @@ async def ppe_detect(req: PpeDetectRequest):
         raise HTTPException(status_code=502, detail=f"Cannot reach YOLO PPE serving: {e}")
 
     detections = result.get("detections", [])
+    log.info("PPE detect: YOLO returned %d detections: %s", len(detections), [d.get("class_name") for d in detections[:5]])
     expected = [c.strip() for c in settings.ppe_classes.split(",")]
     detected_classes = {d["class_name"].lower() for d in detections}
     person_count = sum(1 for d in detections if d["class_name"].lower() == "person")
